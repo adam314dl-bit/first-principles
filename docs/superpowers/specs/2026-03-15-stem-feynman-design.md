@@ -83,9 +83,9 @@ Built for one user first (personal tool), designed for eventual multi-user exten
 
 ### Seeding Content
 
-- Small hand-curated starter set for common STEM paths
-- AI-generated suggestions during exploration (user approves)
-- Manual user additions
+- **Starter set:** ~20–30 hand-curated topics across math (algebra → calculus), physics (mechanics → waves), and CS (algorithms → data structures) with prerequisite edges between them. Stored as a JSON seed file loaded on first run.
+- AI-generated suggestions during exploration (user approves before adding to graph)
+- Manual user additions via an "Add Topic" form
 
 ## Module 2: Learning Session (Problem-First Flow)
 
@@ -110,7 +110,7 @@ Interactive visualization of the concept
 ```
 
 - Hints are layered — each reveals a bit more, never the full answer
-- Full explanation unlocks after submitting an attempt (even if wrong — genuine effort is the point)
+- **"Genuine attempt" rule:** any non-trivial submission unlocks the explanation. The bar is low on purpose — a few sentences of reasoning, a partial equation, a diagram description. The system checks that the submission is non-empty and >20 characters. No AI grading of "effort" — the honor system is the point.
 - Post-explanation interactive visualization lets you play with the concept (adjust parameters, see what changes)
 
 ### Dialogue Mode (Feynman/Socratic)
@@ -131,6 +131,20 @@ Split-pane:
 - **Left:** Challenge or dialogue
 - **Right:** Scratchpad — markdown notes, LaTeX math input (live-rendered via KaTeX), interactive visualizations for the current topic
 
+### Scratchpad Data Model
+
+- Scratchpad content is stored **per-session** (each time you enter a topic, a new session starts)
+- Schema: `session_id`, `topic_id`, `content` (markdown string), `created_at`, `updated_at`
+- Previous session scratchpads are viewable from the session history but don't carry over — each session starts fresh
+- On mobile/narrow screens, the split-pane collapses to a tabbed layout (Challenge | Scratchpad)
+
+### Interactive Visualizations
+
+Visualizations are **not** a pre-built content library. They are generated per-topic in two ways:
+- **AI-generated code:** When a topic has a visualization opportunity (e.g., function graphs, physics simulations), the AI tutor generates a small self-contained HTML/Canvas snippet that runs in a sandboxed iframe. The generated code is cached per topic so it doesn't regenerate every session.
+- **Future:** Hand-curated visualizations can be added as static files per topic, overriding the AI-generated version.
+- Schema: `topic_id`, `visualization_code` (HTML string), `source` (ai-generated | curated), `created_at`
+
 ## Module 3: Creative Review System
 
 Reviews feel like bonus content in a game — side quests, not mandatory grinding.
@@ -141,19 +155,21 @@ Reviews feel like bonus content in a game — side quests, not mandatory grindin
 - "Explain [concept] to a curious 12-year-old"
 - "Your friend says 'derivatives are just slopes.' Are they right? What's missing?"
 - "Create an analogy for [eigenvalues] using something from everyday life"
-- AI evaluates explanation for accuracy and clarity, pushes back on hand-waving
+- AI evaluates explanation and returns structured feedback: `{ passed: boolean, feedback: string, follow_up_question?: string }`. "Passed" means the core concept is accurately conveyed. If not passed, the AI explains what's missing and optionally asks a follow-up. Passing a "Teach It" review advances mastery to level 3.
 
 **2. "What If?" Challenges**
 - "What would happen to planetary orbits if gravity followed a cube law instead of square?"
 - "If there were no concept of zero, how would calculus be different?"
 - "Remove one axiom from group theory. What breaks?"
 - Counterfactual thinking — forces understanding of *why*, not just *what*
+- AI evaluation returns: `{ passed: boolean, feedback: string, depth_score: 1-3 }`. Depth score reflects how far the reasoning went. Passing advances mastery toward level 5.
 
 **3. "Connect" Challenges**
 - "You know [thermodynamic entropy] and [information entropy]. What's the actual relationship?"
 - "Find a real-world system that demonstrates [concept] — something not in any textbook"
 - "Here's a problem that requires combining [topic A] and [topic B]..."
 - Fire when skill tree detects nearby mastered nodes — boss fights bridging knowledge
+- AI evaluation returns: `{ passed: boolean, feedback: string, connection_quality: string }`. Passing advances mastery toward level 4.
 
 ### How Reviews Are Triggered
 
@@ -181,15 +197,26 @@ Completing reviews increases mastery on the original topic, which can unlock dee
 
 ### Session History
 
-- Every dialogue, attempt, and review is saved and searchable
-- Learning journal — auto-generated summary of what you explored, what clicked, what you struggled with
-- Viewable per session or over time
+**Session schema:**
+- `id`, `topic_id`, `mode` (challenge | dialogue), `started_at`, `ended_at`
+- `messages[]` — array of `{ role: user | tutor, content: string, timestamp }`
+- `attempts[]` — array of `{ content: string, hint_level_used: number, timestamp }`
+- `review_results[]` — array of `{ review_type, passed, feedback, timestamp }`
+- `scratchpad_content` — markdown string
+
+All sessions are saved automatically and searchable by topic, date, or content.
+
+**Learning journal:** Auto-generated summary (via AI) at session end — what you explored, what clicked, what you struggled with. Stored as `journal_summary` on the session record. Viewable per session or aggregated over time.
+
+### Review Challenge Generation
+
+All review challenges are **generated on-the-fly by the AI** when triggered. There is no pre-built pool. The generation prompt includes the topic, the user's mastery level, and related topics from the graph. Generated challenges are cached so the same topic doesn't produce duplicate challenges within a short window (7 days).
 
 ### Connection Detection Engine
 
-- **During sessions:** AI tutor is prompted with skill tree context. When discussing a new topic that relates to a mastered one, the tutor surfaces it: "This is like [thing you know] — see the parallel?"
-- **In the skill tree:** Hovering over a topic causes edges to mastered topics to glow amber. Intensity reflects connection strength.
-- **Bridge suggestions:** When two separate branches grow close conceptually, the system suggests a bridge topic: "You're close to seeing how [linear algebra] and [quantum mechanics] connect. Want to explore [Hilbert Spaces]?"
+- **During sessions:** AI tutor is prompted with skill tree context (list of mastered topics + current topic). When discussing a new topic that relates to a mastered one, the tutor surfaces it: "This is like [thing you know] — see the parallel?"
+- **In the skill tree:** Hovering over a topic causes edges to mastered topics to glow amber. Intensity reflects edge `weight` value. This is purely graph-based (follows existing edges), no AI involved.
+- **Bridge suggestions:** Uses graph distance — when two mastered nodes in different branches share a common neighbor within 2 hops that is not yet in the user's graph, the system suggests it as a bridge topic. The AI generates the suggestion text, but the detection is algorithmic (graph traversal), not LLM-based.
 
 ### No Gamification Traps
 
@@ -209,13 +236,27 @@ User selects model → Adapter resolves provider → Sends structured prompt →
 - Model switching: dropdown in the UI, persists per session or globally
 - Supported providers: Claude (Anthropic), GPT (OpenAI), extensible to others
 
-### Prompt Engineering
+### Prompt Architecture
 
-The tutor's behavior is controlled by system prompts that encode:
-- Socratic questioning style
-- Hint layering logic
-- Skill tree context (what the user knows, what they're learning)
-- Subject-specific guidelines (proofs for math, intuition-first for physics, etc.)
+The tutor uses a **template-per-mode** system. Each mode has a system prompt template with variable injection:
+
+**Templates (stored as TypeScript string templates in `lib/prompts/`):**
+- `challenge-generate.ts` — generates a challenge for a topic. Injected: `{topic, subject, difficulty, mastered_topics[]}`
+- `challenge-hints.ts` — generates layered hints. Injected: `{challenge, hint_level, user_attempt?}`
+- `challenge-explain.ts` — generates full explanation. Injected: `{challenge, topic, user_attempt}`
+- `dialogue-system.ts` — Socratic tutor system prompt. Injected: `{topic, subject, mastered_topics[], session_history[]}`
+- `review-evaluate.ts` — evaluates a review response. Injected: `{review_type, challenge, user_response, topic}`
+- `review-generate.ts` — generates review challenges. Injected: `{review_type, topic, related_topics[]}`
+
+All templates follow Socratic/Feynman style by default. Subject-specific instructions (e.g., "for math proofs, insist on rigor" vs. "for physics, lead with intuition") are embedded in each template based on the `subject` tag.
+
+### Error Handling
+
+- **API failure:** Show a friendly inline message ("Tutor is thinking... taking longer than usual"). Retry once after 3 seconds. If still failing, offer to switch models or continue with scratchpad-only mode.
+- **Rate limits:** Queue requests, show a countdown. No silent failures.
+- **Invalid API key:** Detected on first call, surface a settings link to fix it.
+- **Offline:** The skill tree, session history, scratchpad, and progress all work offline. Only AI dialogue/challenge generation requires connectivity. Show a clear "offline — AI features unavailable" banner.
+- **Response caching:** Challenge questions and explanations are cached per topic + difficulty. Dialogue is never cached (it's conversational). Visualizations are cached per topic.
 
 ## Visual Style: Warm Notebook
 
