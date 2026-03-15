@@ -3908,7 +3908,9 @@ export default function SplitPane({ left, right, leftLabel = "Session", rightLab
 }
 ```
 
-- [ ] **17.3** Create `src/app/session/[topicId]/page.tsx` — creates session, renders ChallengeMode/DialogueMode + Scratchpad with ModeToggle. Includes ReviewWarmup check (30% chance).
+- [ ] **17.3** Create `src/app/session/[topicId]/page.tsx` — creates session, renders ChallengeMode/DialogueMode + Scratchpad with ModeToggle. Includes End Session button. The warm-up modal is a placeholder stub here — Chunk 5 (Task 20.3) creates the real `ReviewWarmup` component and must wire it into this page.
+
+**Note:** ChallengeMode and DialogueMode render AI-generated text as plain text. STEM content will contain LaTeX notation. Extract the `renderMathInText` function from `Scratchpad.tsx` into `src/lib/render-math.ts` as a shared utility, and apply it via `dangerouslySetInnerHTML` to challenge questions, hints, explanations, and dialogue messages. Do this as a follow-up step after Task 16 creates the function.
 
 ```tsx
 // src/app/session/[topicId]/page.tsx
@@ -3986,6 +3988,7 @@ export default function SessionPage({ params }: { params: Promise<{ topicId: str
           <span className="rounded-full bg-amber-light px-2 py-0.5 text-xs text-amber">{topic.subject}</span>
         </div>
         <ModeToggle mode={mode} onChange={handleModeChange} />
+        <button onClick={async () => { await fetch(`/api/sessions/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endSession: true }) }); window.location.href = "/tree"; }} className="rounded-md border border-tan-dark bg-parchment px-3 py-1.5 text-sm text-ink-muted hover:bg-tan-light">End Session</button>
       </div>
       <div className="flex-1 overflow-hidden">
         <SplitPane leftLabel={mode === "challenge" ? "Challenge" : "Dialogue"} rightLabel="Scratchpad"
