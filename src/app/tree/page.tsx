@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import dynamic from "next/dynamic";
 import type { CosmosNode, CosmosEdge } from "@/components/cosmos/cosmos-types";
 
 const CosmosTree = dynamic(() => import("@/components/cosmos/CosmosTree"), { ssr: false });
 
-export default function TreePage() {
+function TreeContent() {
   const [nodes, setNodes] = useState<CosmosNode[]>([]);
   const [edges, setEdges] = useState<CosmosEdge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,4 +32,12 @@ export default function TreePage() {
   if (loading) return null;
 
   return <CosmosTree nodes={nodes} edges={edges} newlyMasteredId={newlyMasteredId} />;
+}
+
+export default function TreePage() {
+  return (
+    <Suspense fallback={null}>
+      <TreeContent />
+    </Suspense>
+  );
 }
