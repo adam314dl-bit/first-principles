@@ -5,9 +5,26 @@ import { sessions, topics } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const includeTopic = searchParams.get("include_topic") === "true";
+
   const allSessions = db.select().from(sessions).orderBy(desc(sessions.startedAt)).all();
-  return NextResponse.json(allSessions);
+
+  if (includeTopic) {
+    const enriched = allSessions.map((s) => {
+      const topic = db.select().from(topics).where(eq(topics.id, s.topicId)).get();
+      return {
+        ...s,
+        topicTitle: topic?.title ?? null,
+        subject: topic?.subject ?? null,
+        masteryChange: null, // computed from review history if needed
+      };
+    });
+    return NextResponse.json({ sessions: enriched });
+  }
+
+  return NextResponse.json({ sessions: allSessions });
 }
 
 export async function POST(req: NextRequest) {
