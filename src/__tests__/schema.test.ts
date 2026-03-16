@@ -4,7 +4,7 @@ import * as schema from "@/lib/db/schema";
 
 describe("Database Schema", () => {
   const cases: [string, object, string[]][] = [
-    ["topics", schema.topics, ["id", "title", "subject", "difficulty", "status", "masteryLevel", "description", "createdAt", "updatedAt"]],
+    ["topics", schema.topics, ["id", "title", "subject", "difficulty", "status", "masteryLevel", "description", "createdAt", "updatedAt", "cosmosX", "cosmosY", "cosmosRadius", "domain", "nodeType"]],
     ["edges", schema.edges, ["id", "sourceId", "targetId", "type", "weight"]],
     ["sessions", schema.sessions, ["id", "topicId", "mode", "scratchpadContent", "journalSummary", "startedAt", "endedAt"]],
     ["messages", schema.messages, ["id", "sessionId", "role", "content", "timestamp"]],

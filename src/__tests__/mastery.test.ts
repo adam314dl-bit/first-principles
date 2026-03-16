@@ -13,7 +13,7 @@ function createTestDb() {
   sqlite.pragma("foreign_keys = ON");
   const testDb = drizzle(sqlite, { schema });
   sqlite.exec(`
-    CREATE TABLE topics (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL, difficulty INTEGER NOT NULL DEFAULT 1, status TEXT NOT NULL DEFAULT 'locked', mastery_level INTEGER NOT NULL DEFAULT 0, description TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')));
+    CREATE TABLE topics (id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL, difficulty INTEGER NOT NULL DEFAULT 1, status TEXT NOT NULL DEFAULT 'locked', mastery_level INTEGER NOT NULL DEFAULT 0, description TEXT NOT NULL DEFAULT '', created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')), cosmos_x REAL, cosmos_y REAL, cosmos_radius REAL DEFAULT 10, domain TEXT DEFAULT 'core', node_type TEXT DEFAULT 'star');
     CREATE TABLE sessions (id TEXT PRIMARY KEY, topic_id TEXT NOT NULL REFERENCES topics(id), mode TEXT NOT NULL DEFAULT 'challenge', scratchpad_content TEXT NOT NULL DEFAULT '', journal_summary TEXT, started_at TEXT NOT NULL DEFAULT (datetime('now')), ended_at TEXT);
     CREATE TABLE attempts (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id), content TEXT NOT NULL, hint_level_used INTEGER NOT NULL DEFAULT 0, timestamp TEXT NOT NULL DEFAULT (datetime('now')));
     CREATE TABLE review_results (id TEXT PRIMARY KEY, session_id TEXT NOT NULL REFERENCES sessions(id), review_type TEXT NOT NULL, passed INTEGER NOT NULL DEFAULT 0, feedback TEXT NOT NULL DEFAULT '', timestamp TEXT NOT NULL DEFAULT (datetime('now')));

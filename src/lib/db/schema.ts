@@ -12,6 +12,11 @@ export const topics = sqliteTable("topics", {
   description: text("description").notNull().default(""),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
+  cosmosX: real("cosmos_x"),
+  cosmosY: real("cosmos_y"),
+  cosmosRadius: real("cosmos_radius").default(10),
+  domain: text("domain").default("core"),
+  nodeType: text("node_type").default("star"),
 });
 
 export const edges = sqliteTable("edges", {

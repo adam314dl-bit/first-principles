@@ -14,7 +14,9 @@ function createTestDb() {
       id TEXT PRIMARY KEY, title TEXT NOT NULL, subject TEXT NOT NULL,
       difficulty INTEGER NOT NULL DEFAULT 1, status TEXT NOT NULL DEFAULT 'locked',
       mastery_level INTEGER NOT NULL DEFAULT 0, description TEXT NOT NULL DEFAULT '',
-      created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+      created_at TEXT NOT NULL DEFAULT (datetime('now')), updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      cosmos_x REAL, cosmos_y REAL, cosmos_radius REAL DEFAULT 10,
+      domain TEXT DEFAULT 'core', node_type TEXT DEFAULT 'star'
     );
     CREATE TABLE edges (
       id TEXT PRIMARY KEY, source_id TEXT NOT NULL REFERENCES topics(id),
