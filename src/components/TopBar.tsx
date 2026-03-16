@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const navTabs = [
-  { label: "Skill Tree", href: "/tree" },
+  { label: "Cosmos", href: "/tree" },
   { label: "Playground", href: "/playground" },
   { label: "Journal", href: "/journal" },
 ] as const;

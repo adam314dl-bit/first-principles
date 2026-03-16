@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { title, subject, difficulty, description, status } = body;
+  const { title, subject, difficulty, description, status, cosmosX, cosmosY, cosmosRadius, domain, nodeType } = body;
 
   if (!title || !subject) {
     return NextResponse.json({ error: "title and subject are required" }, { status: 400 });
@@ -34,6 +34,11 @@ export async function POST(req: NextRequest) {
     status: status ?? "locked" as const,
     masteryLevel: 0,
     description: description ?? "",
+    cosmosX: cosmosX ?? null,
+    cosmosY: cosmosY ?? null,
+    cosmosRadius: cosmosRadius ?? 10,
+    domain: domain ?? "core",
+    nodeType: nodeType ?? "star",
   };
 
   db.insert(topics).values(newTopic).run();

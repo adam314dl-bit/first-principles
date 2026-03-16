@@ -73,7 +73,7 @@ export default function SessionPage({ params }: { params: Promise<{ topicId: str
           <span className="rounded-full bg-amber-light px-2 py-0.5 text-xs text-amber">{topic.subject}</span>
         </div>
         <ModeToggle mode={mode} onChange={handleModeChange} />
-        <button onClick={async () => { await fetch(`/api/sessions/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endSession: true }) }); window.location.href = "/tree"; }} className="rounded-md border border-tan-dark bg-parchment px-3 py-1.5 text-sm text-ink-muted hover:bg-tan-light">End Session</button>
+        <button onClick={async () => { await fetch(`/api/sessions/${session.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ endSession: true }) }); window.location.href = `/tree?mastered=${topicId}`; }} className="rounded-md border border-tan-dark bg-parchment px-3 py-1.5 text-sm text-ink-muted hover:bg-tan-light">End Session</button>
       </div>
       <div className="flex-1 overflow-hidden">
         <SplitPane leftLabel={mode === "challenge" ? "Challenge" : "Dialogue"} rightLabel="Scratchpad"
