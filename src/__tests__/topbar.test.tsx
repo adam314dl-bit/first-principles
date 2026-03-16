@@ -18,7 +18,7 @@ describe("TopBar", () => {
 
   it("renders all three navigation tabs", () => {
     render(<TopBar />);
-    expect(screen.getByText("Skill Tree")).toBeTruthy();
+    expect(screen.getByText("Cosmos")).toBeTruthy();
     expect(screen.getByText("Playground")).toBeTruthy();
     expect(screen.getByText("Journal")).toBeTruthy();
   });
@@ -34,7 +34,7 @@ describe("TopBar", () => {
 
   it("highlights the active nav tab", () => {
     render(<TopBar />);
-    const skillTreeLink = screen.getByText("Skill Tree");
-    expect(skillTreeLink.className).toContain("text-amber");
+    const cosmosLink = screen.getByText("Cosmos");
+    expect(cosmosLink.className).toContain("text-amber");
   });
 });
