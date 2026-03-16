@@ -19,7 +19,7 @@ describe("Theme", () => {
 
   it("tailwind.config.ts defines custom font families", () => {
     const config = fs.readFileSync(path.resolve(__dirname, "../../tailwind.config.ts"), "utf-8");
-    for (const f of ["font-instrument-serif", "font-caveat", "font-inter", "font-jetbrains-mono"]) {
+    for (const f of ["font-instrument-serif", "font-nunito", "font-inter", "font-jetbrains-mono"]) {
       expect(config).toContain(f);
     }
   });
