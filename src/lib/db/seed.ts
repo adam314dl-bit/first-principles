@@ -2,7 +2,7 @@
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import * as schema from "./schema";
-import seedData from "../../data/seed-topics.json";
+import seedData from "../../data/seed-cosmos.json";
 import path from "path";
 
 async function seed() {
@@ -29,13 +29,17 @@ async function seed() {
       difficulty: topic.difficulty,
       status: topic.status as "locked" | "available" | "in-progress" | "mastered",
       masteryLevel: topic.masteryLevel, description: topic.description,
+      cosmosX: topic.cosmosX, cosmosY: topic.cosmosY,
+      cosmosRadius: topic.cosmosRadius, domain: topic.domain,
+      nodeType: topic.nodeType,
     }).run();
   }
   console.log(`Inserted ${seedData.topics.length} topics.`);
 
-  for (const edge of seedData.edges) {
+  for (let i = 0; i < seedData.edges.length; i++) {
+    const edge = seedData.edges[i];
     db.insert(schema.edges).values({
-      id: edge.id, sourceId: edge.sourceId, targetId: edge.targetId,
+      id: `e${i + 1}`, sourceId: edge.sourceId, targetId: edge.targetId,
       type: edge.type as "prerequisite" | "related" | "deepens",
       weight: edge.weight,
     }).run();
