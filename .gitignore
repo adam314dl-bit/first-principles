@@ -48,3 +48,6 @@ first-principles.db-wal
 
 # Environment
 .env.local
+
+# Local settings
+data/settings.json
