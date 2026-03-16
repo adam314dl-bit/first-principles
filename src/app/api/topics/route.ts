@@ -2,11 +2,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { topics } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
 
-export async function GET() {
-  const allTopics = db.select().from(topics).all();
-  return NextResponse.json(allTopics);
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url);
+  const status = searchParams.get("status");
+  let result;
+  if (status) {
+    result = db.select().from(topics).where(eq(topics.status, status as "locked" | "available" | "in-progress" | "mastered")).all();
+  } else {
+    result = db.select().from(topics).all();
+  }
+  return NextResponse.json({ topics: result });
 }
 
 export async function POST(req: NextRequest) {

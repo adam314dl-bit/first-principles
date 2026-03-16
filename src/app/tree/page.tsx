@@ -17,7 +17,8 @@ export default function TreePage() {
       setLoading(true);
       const [topicsRes, edgesRes] = await Promise.all([fetch("/api/topics"), fetch("/api/edges")]);
       if (!topicsRes.ok || !edgesRes.ok) throw new Error("Failed to fetch graph data");
-      setNodes(await topicsRes.json());
+      const topicsData = await topicsRes.json();
+      setNodes(topicsData.topics ?? topicsData);
       setEdges(await edgesRes.json());
       setError(null);
     } catch (err) {
