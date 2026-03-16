@@ -1,6 +1,7 @@
 // src/components/session/ChallengeMode.tsx
 "use client";
 import { useState, useCallback } from "react";
+import Visualization from "@/components/session/Visualization";
 
 interface ChallengeModeProps { topicId: string; topicTitle: string; sessionId: string; }
 
@@ -109,6 +110,11 @@ export default function ChallengeMode({ topicId, topicTitle, sessionId }: Challe
         <div className="rounded-lg border border-gold bg-white p-5 shadow-sm">
           <h3 className="mb-3 font-serif text-lg text-gold">Explanation</h3>
           <div className="prose prose-sm max-w-none text-ink-body whitespace-pre-wrap">{explanation}</div>
+        </div>
+      )}
+      {explanation && (
+        <div className="mt-6">
+          <Visualization topicId={topicId} topicTitle={topicTitle} />
         </div>
       )}
       {loading && <div className="flex items-center gap-2 text-sm text-ink-muted"><div className="h-4 w-4 animate-spin rounded-full border-2 border-amber border-t-transparent" />Tutor is thinking...</div>}
