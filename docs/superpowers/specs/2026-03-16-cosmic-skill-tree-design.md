@@ -198,67 +198,151 @@ Cross-domain connections exist (e.g., Waves ↔ Optics ↔ E&M, Energy ↔ Therm
 
 ### Technology Stack
 
-- **PixiJS 8** via `@pixi/react` — WebGL 2D renderer
-- **PixiJS Filters** — BlurFilter for nebulae, glow effects
+- **PixiJS 8** — WebGL 2D renderer, used imperatively via `useEffect`/`useRef` (NOT `@pixi/react`, which lacks a stable v8 release)
+- **PixiJS Filters** — BlurFilter for glow effects on nodes
 - **PixiJS ParticleContainer** — efficient rendering of 400+ background stars
 - **Custom ticker animations** — star twinkling, node pulsing, particle flow, nebula drift
 - **CSS transitions** — zoom overlay, detail card animations
-- **No D3** — completely replaced
+- **No D3** — completely replaced. Remove `d3` and `@types/d3` from `package.json`.
+
+### SSR Strategy
+
+PixiJS accesses browser globals (`window`, `WebGLRenderingContext`, `document.createElement("canvas")`) at module evaluation time. The CosmosTree component MUST be loaded with SSR disabled:
+
+```tsx
+// src/app/tree/page.tsx
+import dynamic from "next/dynamic";
+const CosmosTree = dynamic(() => import("@/components/cosmos/CosmosTree"), { ssr: false });
+```
+
+The component itself uses `"use client"` and initializes PixiJS inside a `useEffect` with an async IIFE:
+
+```tsx
+useEffect(() => {
+  let app: Application;
+  (async () => {
+    app = new Application();
+    await app.init({ resizeTo: containerRef.current!, background: 0x020108, antialias: true });
+    containerRef.current?.appendChild(app.canvas);
+    setCanvasReady(true);
+    // ... build scene
+  })();
+  return () => { app?.destroy(true); };
+}, []);
+```
+
+A loading state is shown until `canvasReady` is true.
+
+### Font Loading
+
+Add Cinzel and Cormorant Garamond to `src/app/layout.tsx`:
+
+```tsx
+import { Cinzel, Cormorant_Garamond } from "next/font/google";
+const cinzel = Cinzel({ subsets: ["latin"], variable: "--font-cinzel", display: "swap" });
+const cormorantGaramond = Cormorant_Garamond({
+  subsets: ["latin"], weight: ["400", "600"], style: ["normal", "italic"],
+  variable: "--font-cormorant", display: "swap"
+});
+```
+
+Register `--font-cinzel` and `--font-cormorant` in `globals.css` `@theme {}` block.
 
 ### Component Architecture
 
 ```
-CosmosTree (React wrapper)
-├── PixiJS Application (WebGL canvas)
+CosmosTree ("use client", dynamic import ssr:false)
+├── Loading state (shown while PixiJS initializes)
+├── Canvas container (ref, PixiJS appends canvas here)
+├── PixiJS Application (WebGL, imperative via useEffect)
 │   ├── Background Stars Layer (ParticleContainer, 400 stars)
-│   ├── Nebula Layer (Container with BlurFilter)
+│   ├── Nebula Layer (Container — pre-baked RenderTexture sprites, NOT live BlurFilter)
 │   ├── Connection Layer (Graphics lines)
 │   ├── Particle Layer (energy flow dots)
 │   └── Node Layer (interactive star containers)
-│       ├── Glow circle (BlurFilter)
-│       ├── Main circle (border + fill)
+│       ├── Glow circle (BlurFilter on individual nodes only)
+│       ├── Main circle (border + fill, separate Graphics for stroke alpha)
 │       ├── Inner ring
 │       ├── Physics icon (Graphics)
 │       └── Corona rays (boss only)
-├── Zoom Overlay (React/HTML)
-│   ├── Star Orb with rings
-│   ├── Node details
+├── Zoom Overlay (React/HTML, CSS transitions)
+│   ├── Star Orb with expanding rings
+│   ├── Node details (name, type, description)
 │   ├── Mastery bar
 │   └── Action buttons
-└── Stats Panel (React/HTML)
+└── Stats Panel (React/HTML, frosted glass)
 ```
 
 ### Data Model Changes
 
-Add columns to `topics` table:
+Update `src/lib/db/schema.ts` to add new columns to the `topics` table:
 
-```sql
-ALTER TABLE topics ADD COLUMN cosmos_x REAL;
-ALTER TABLE topics ADD COLUMN cosmos_y REAL;
-ALTER TABLE topics ADD COLUMN cosmos_radius REAL DEFAULT 10;
-ALTER TABLE topics ADD COLUMN domain TEXT DEFAULT 'core';
+```typescript
+cosmosX: real("cosmos_x"),
+cosmosY: real("cosmos_y"),
+cosmosRadius: real("cosmos_radius").default(10),
+domain: text("domain").default("core"),
+nodeType: text("node_type").default("star"), // 'galaxy' | 'star' | 'boss'
 ```
 
-Seed positions are pre-computed to create the asymmetric layout described above. The `domain` field determines nebula region coloring.
+The `nodeType` column drives visual rendering and interaction rules:
+- `galaxy` — the root node (spiral galaxy visual)
+- `star` — standard learn nodes
+- `boss` — boss challenge nodes (red giant visual, corona rays)
+
+Apply migration via: `npx drizzle-kit generate && npx drizzle-kit push`
+
+### Seed Data & Migration Plan
+
+1. **Schema update**: Add 5 new nullable columns to `topics` table in `schema.ts`
+2. **Seed data**: Create a new `src/data/seed-cosmos.json` file containing the 52-60 physics topics with pre-computed `cosmos_x`, `cosmos_y`, `cosmos_radius`, `domain`, and `node_type` values. This replaces the physics topics in the existing `seed-topics.json`.
+3. **Existing topic IDs**: Preserve IDs that overlap (e.g., `kinematics`, `newtons-laws`). Existing user sessions tied to these IDs remain valid.
+4. **Seed script**: Update `src/lib/db/seed.ts` to read from `seed-cosmos.json` and populate all new columns. The `npm run db:seed` command rebuilds the full graph.
+5. **AddTopicModal**: When a user adds a custom topic via the modal, auto-place it at a computed position offset from an existing connected node (e.g., +50px x, +30px y from the nearest prerequisite). The POST route `/api/topics` sets default `cosmos_radius=10`, `domain='core'`, `nodeType='star'`.
+
+### In-Progress Node Status
+
+The existing schema has 4 statuses: `locked`, `available`, `in-progress`, `mastered`. The cosmos renders them as:
+
+| Status | Visual | BFS Origin? |
+|--------|--------|-------------|
+| `mastered` | Bright star, full glow, particles | Yes |
+| `in-progress` | Bright star with amber/warm tint (distinct from mastered blue/white) | Yes (counts as explored) |
+| `available` | Green pulsing star | No |
+| `locked` | Dim ghost or fogged | No |
+
+Both `mastered` and `in-progress` nodes serve as BFS origins for fog clearing, since the player has actively engaged with them.
 
 ### Pan & Zoom Implementation
 
 - World container uses `scale` and `position` transforms
 - Scroll wheel adjusts `targetScale`, ticker interpolates `scale` toward target (ease factor 0.1)
 - Pointer drag updates `panX`/`panY` offsets applied to world container
-- Touch events: same logic with pointer events API
+- **Touch/pinch zoom**: Track multiple `pointerId` values via `pointerdown`/`pointermove`. Compute distance between two active pointers; delta maps to scale change. This is a distinct implementation task.
 
 ### Fog of War Implementation
 
-- On data load, compute "visible set" using BFS from mastered nodes (depth ≤ 2)
-- Only render nodes in the visible set + mastered set
+- On data load, compute "visible set" using BFS from mastered + in-progress nodes (depth ≤ 2)
+- Only render nodes in the visible set
 - Nebula opacity varies inversely with nearby mastered node density
 - When a node is mastered, recompute visible set and animate newly visible nodes
+
+### Fog Reveal on Return from Session
+
+When a player masters a topic in `/session/[topicId]` and returns to the cosmos:
+
+1. Session page navigates to `/tree?mastered=topicId` (query param)
+2. CosmosTree reads `mastered` param on mount
+3. Computes the "old visible set" (excluding the newly mastered node) and "new visible set" (including it)
+4. Diff the two sets — any nodes in new but not old get a fade-in animation (0→1 opacity over 1.5s)
+5. If the mastered node was a boss, trigger a dramatic nebula-clearing animation (wider area, slower reveal)
+6. Clear the query param from the URL via `router.replace("/tree")` after animation completes
 
 ### Performance Budget
 
 - Background stars: single ParticleContainer (very cheap)
-- Nebulae: 5-6 blurred circles (computed once, drifted via position)
+- **Nebulae: pre-baked RenderTexture sprites** — each nebula is rendered ONCE at startup with BlurFilter applied to a RenderTexture, then displayed as a simple Sprite. Drifting the sprite changes only its position (no re-blur per frame). This avoids the 10-20ms/frame cost of live BlurFilter on large areas.
+- Individual node glow: small BlurFilter per active node (small radius, cheap)
 - Interactive nodes: 50-60 Graphics objects (trivial for WebGL)
 - Particles: ~20-40 small circles animating along paths
 - Target: 60fps on integrated GPUs, <50MB memory
@@ -267,11 +351,13 @@ Seed positions are pre-computed to create the asymmetric layout described above.
 
 ### What Changes
 
-- `/tree` page: completely rewritten with CosmosTree component
+- `/tree` page: completely rewritten with CosmosTree component (dynamic import, ssr:false)
 - `SkillTree` D3 component: deleted
-- `AddTopicModal`: kept, triggered from cosmos UI (floating action button)
-- TopBar: "Skill Tree" tab renamed to "Cosmos"
-- Database: topics table gets 4 new columns
+- `AddTopicModal`: kept, auto-places new topics at computed positions
+- TopBar: "Skill Tree" tab label renamed to "Cosmos" (route stays `/tree` to avoid breaking links)
+- Database: topics table gets 5 new columns
+- Layout: add Cinzel + Cormorant Garamond fonts
+- Dependencies: add `pixi.js`, remove `d3` and `@types/d3`
 
 ### What Stays the Same
 
@@ -281,6 +367,13 @@ Seed positions are pre-computed to create the asymmetric layout described above.
 - AI adapter, prompts, review system
 - Graph engine algorithms (unlocking, bridge detection)
 - Database tables (topics, edges, sessions, messages, attempts, reviewResults, visualizations)
+- Route path `/tree` (only the display label changes to "Cosmos")
+
+### Test Updates
+
+- Delete `src/__tests__/skill-tree.test.tsx` (tests deleted SkillTree component)
+- Add `src/__tests__/cosmos-tree.test.tsx` with smoke tests: canvas container renders, zoom overlay toggles on node click, data-testid for the canvas wrapper
+- Update `src/__tests__/topbar.test.tsx`: change assertion from `"Skill Tree"` to `"Cosmos"`
 
 ### Navigation Flow
 
@@ -288,7 +381,8 @@ Seed positions are pre-computed to create the asymmetric layout described above.
 Cosmos (pan/zoom/explore) →
   Click star → Zoom overlay →
     "Begin Session" → /session/[topicId] (existing page) →
-      Complete session → Back to Cosmos (node now mastered, fog recedes)
+      Complete session → navigates to /tree?mastered=topicId →
+        CosmosTree animates fog reveal → new stars appear
 ```
 
 ## Success Criteria
@@ -296,6 +390,10 @@ Cosmos (pan/zoom/explore) →
 1. The cosmic tree renders at 60fps with all animations on a mid-range laptop
 2. Clicking a star triggers the cinematic zoom in <500ms
 3. Fog correctly hides nodes beyond 2 hops and reveals them on mastery
-4. All existing session/review/AI functionality works unchanged
-5. The experience feels like a game — users want to "light up" more stars
-6. Pan/zoom is smooth and responsive on both desktop and mobile
+4. Fog reveal animation plays when returning from a completed session
+5. All existing session/review/AI functionality works unchanged
+6. The experience feels like a game — users want to "light up" more stars
+7. Pan/zoom is smooth and responsive on both desktop and mobile
+8. In-progress topics render distinctly from mastered and available
+9. Boss nodes are visually distinct and their defeat triggers dramatic fog clearing
+10. New topics added via AddTopicModal appear at valid positions
