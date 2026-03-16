@@ -29,9 +29,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const topic = db.query.topics.findFirst({
-      where: eq(topics.id, topic_id),
-    });
+    const topic = db.select().from(topics).where(eq(topics.id, topic_id)).get();
     if (!topic) {
       return NextResponse.json({ error: "Topic not found" }, { status: 404 });
     }

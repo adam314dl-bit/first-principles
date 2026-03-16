@@ -23,12 +23,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const topic = db.query.topics.findFirst({ where: eq(topics.id, topic_id) });
+    const topic = db.select().from(topics).where(eq(topics.id, topic_id)).get();
     if (!topic) {
       return NextResponse.json({ error: "Topic not found" }, { status: 404 });
     }
 
-    const session = db.query.sessions.findFirst({ where: eq(sessions.id, session_id) });
+    const session = db.select().from(sessions).where(eq(sessions.id, session_id)).get();
     if (!session) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }

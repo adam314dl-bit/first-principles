@@ -99,13 +99,13 @@ export default function ReviewCard({ challenge, reviewType, topicId, topicTitle,
         <div className={`mt-4 rounded-md border p-4 ${result.passed ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}>
           <p className="font-medium text-sm mb-1">{result.passed ? "Passed!" : "Not quite"}</p>
           <p className="text-sm text-ink-body">{result.feedback as string}</p>
-          {reviewType === "teach-it" && result.follow_up_question && (
+          {reviewType === "teach-it" && Boolean(result.follow_up_question) && (
             <p className="mt-2 text-sm text-ink-muted italic">Follow-up: {result.follow_up_question as string}</p>
           )}
           {reviewType === "what-if" && result.depth_score !== undefined && (
             <p className="mt-2 text-sm text-ink-muted">Depth score: {result.depth_score as number}/3</p>
           )}
-          {reviewType === "connect" && result.connection_quality && (
+          {reviewType === "connect" && Boolean(result.connection_quality) && (
             <p className="mt-2 text-sm text-ink-muted">Connection quality: {result.connection_quality as string}</p>
           )}
         </div>
