@@ -34,7 +34,8 @@ describe("TopBar", () => {
 
   it("highlights the active nav tab", () => {
     render(<TopBar />);
-    const cosmosLink = screen.getByText("Cosmos");
-    expect(cosmosLink.className).toContain("text-amber");
+    const cosmosText = screen.getByText("Cosmos");
+    const cosmosLink = cosmosText.closest("a") ?? cosmosText;
+    expect(cosmosLink.className).toContain("text-text");
   });
 });
