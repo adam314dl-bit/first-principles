@@ -12,22 +12,25 @@ export default function StatsPanel({ nodes }: StatsPanelProps) {
   const nextBoss = nodes.find((n) => n.nodeType === "boss" && n.status !== "mastered");
 
   return (
-    <div className="fixed bottom-3.5 left-3.5 z-20 bg-[rgba(4,3,12,.88)] border border-[rgba(80,90,140,.08)] rounded px-3.5 py-2.5 min-w-[155px] backdrop-blur-sm">
-      <h3 className="font-[family-name:var(--font-cinzel)] text-[9px] text-[rgba(140,150,180,.22)] tracking-[3px] mb-1.5 border-b border-[rgba(80,90,140,.06)] pb-1">
-        NAVIGATION
+    <div
+      className="fixed bottom-3.5 left-3.5 z-20 rounded-lg px-3.5 py-2.5 min-w-[155px] backdrop-blur-sm"
+      style={{ background: "rgba(255,255,255,0.95)", border: "1px solid var(--color-border)", boxShadow: "0 4px 16px rgba(15,23,42,0.1)" }}
+    >
+      <h3 className="text-[9px] font-semibold text-text-3 tracking-[3px] uppercase mb-1.5 border-b border-border pb-1">
+        Navigation
       </h3>
-      <div className="flex justify-between text-[11px] text-[rgba(120,130,160,.3)] mb-0.5">
+      <div className="flex justify-between text-[11px] text-text-3 mb-0.5">
         <span>Stars charted</span>
-        <span className="font-[family-name:var(--font-cinzel)] text-[rgba(100,180,140,.35)]">{mastered} / {total}</span>
+        <span className="font-medium text-success">{mastered} / {total}</span>
       </div>
-      <div className="flex justify-between text-[11px] text-[rgba(120,130,160,.3)] mb-0.5">
+      <div className="flex justify-between text-[11px] text-text-3 mb-0.5">
         <span>Reachable</span>
-        <span className="font-[family-name:var(--font-cinzel)] text-[rgba(160,170,200,.3)]">{available}</span>
+        <span className="font-medium text-accent">{available}</span>
       </div>
       {nextBoss && (
-        <div className="flex justify-between text-[11px] text-[rgba(120,130,160,.3)]">
+        <div className="flex justify-between text-[11px] text-text-3">
           <span>Next challenge</span>
-          <span className="font-[family-name:var(--font-cinzel)] text-[rgba(180,100,90,.3)]">{nextBoss.title}</span>
+          <span className="font-medium text-gold">{nextBoss.title}</span>
         </div>
       )}
     </div>
