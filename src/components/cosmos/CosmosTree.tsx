@@ -151,7 +151,9 @@ export default function CosmosTree({ nodes, edges, newlyMasteredId }: CosmosTree
       destroyed = true;
       if (onMove) window.removeEventListener("pointermove", onMove);
       if (onUp) window.removeEventListener("pointerup", onUp);
-      if (app) app.destroy(true);
+      if (app) {
+        try { app.destroy(true); } catch { /* PixiJS resize observer cleanup race */ }
+      }
     };
   }, [nodes, edges, handleNodeClick]);
 
@@ -160,7 +162,7 @@ export default function CosmosTree({ nodes, edges, newlyMasteredId }: CosmosTree
       {/* Loading state */}
       {!canvasReady && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <p className="font-[family-name:var(--font-cinzel)] text-[rgba(140,150,180,.25)] text-sm tracking-[4px] animate-pulse">
+          <p className="font-sans text-[rgba(99,102,241,.25)] text-sm tracking-[4px] animate-pulse">
             CHARTING THE COSMOS...
           </p>
         </div>
@@ -174,10 +176,10 @@ export default function CosmosTree({ nodes, edges, newlyMasteredId }: CosmosTree
 
       {/* Title */}
       <div className="fixed top-3.5 left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none">
-        <h1 className="font-[family-name:var(--font-cinzel)] text-sm text-[rgba(160,170,200,.35)] tracking-[8px]">
+        <h1 className="font-sans text-sm text-[rgba(99,102,241,.35)] tracking-[8px]">
           THE PHYSICS COSMOS
         </h1>
-        <p className="font-[family-name:var(--font-cormorant)] italic text-[11px] text-[rgba(120,130,160,.2)] tracking-wider mt-0.5">
+        <p className="font-sans italic text-[11px] text-[rgba(99,102,241,.2)] tracking-wider mt-0.5">
           scroll to zoom · drag to pan · click stars to explore
         </p>
       </div>
