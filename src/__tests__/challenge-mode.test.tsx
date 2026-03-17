@@ -58,4 +58,43 @@ describe("ChallengeMode", () => {
     await user.click(screen.getByText("Generate Challenge"));
     await waitFor(() => { expect(screen.getByText("API key invalid")).toBeTruthy(); });
   });
+
+  it("displays hook callout when lesson returns a hook", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        challenge: "What is speed at an instant?",
+        hook: "Your speedometer does not count anything.",
+        source: "lesson",
+      }),
+    });
+    const user = userEvent.setup();
+    render(<ChallengeMode {...props} />);
+    await user.click(screen.getByText("Generate Challenge"));
+    await waitFor(() => {
+      expect(screen.getByText(/Your speedometer does not count anything/)).toBeTruthy();
+    });
+  });
+
+  it("hook callout is hidden after submitting attempt", async () => {
+    mockFetch
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          challenge: "What is speed at an instant?",
+          hook: "Your speedometer does not count anything.",
+          source: "lesson",
+        }),
+      })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+    const user = userEvent.setup();
+    render(<ChallengeMode {...props} />);
+    await user.click(screen.getByText("Generate Challenge"));
+    await waitFor(() => expect(screen.getByLabelText("Your attempt")).toBeTruthy());
+    await user.type(screen.getByLabelText("Your attempt"), "I think derivatives measure instantaneous rate of change");
+    await user.click(screen.getByText("Submit Attempt"));
+    await waitFor(() => {
+      expect(screen.queryByText(/Your speedometer does not count anything/)).toBeNull();
+    });
+  });
 });
