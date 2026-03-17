@@ -6,9 +6,10 @@ import path from "path";
 describe("Theme", () => {
   it("globals.css contains all required CSS variables", () => {
     const css = fs.readFileSync(path.resolve(__dirname, "../app/globals.css"), "utf-8");
-    const vars = ["--color-cream", "--color-parchment", "--color-tan-light", "--color-tan-dark",
-      "--color-amber", "--color-amber-light", "--color-gold", "--color-ink",
-      "--color-ink-body", "--color-ink-muted", "--color-locked-bg"];
+    const vars = ["--color-bg", "--color-surface", "--color-surface-alt", "--color-border", "--color-border-strong",
+      "--color-text", "--color-text-2", "--color-text-3", "--color-accent", "--color-accent-hover",
+      "--color-accent-surface", "--color-accent-border", "--color-success", "--color-success-surface",
+      "--color-gold", "--color-gold-surface", "--color-danger"];
     for (const v of vars) { expect(css).toContain(v); }
   });
 

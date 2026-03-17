@@ -2,56 +2,48 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #faf7f2;
-  --color-parchment: #f0e9de;
-  --color-tan-light: #e8dfd3;
-  --color-tan-dark: #ddd2c2;
-  --color-amber: #d97706;
-  --color-amber-light: #fef3e2;
-  --color-gold: #b8860b;
-  --color-ink: #2d2a24;
-  --color-ink-body: #4a4539;
-  --color-ink-muted: #8a7a65;
-  --color-locked-bg: #f5f0e8;
+  /* White Scholar core */
+  --color-bg:              #ffffff;
+  --color-surface:         #f8fafc;
+  --color-surface-alt:     #f1f5f9;
+  --color-border:          #e2e8f0;
+  --color-border-strong:   #cbd5e1;
+  --color-text:            #0f172a;
+  --color-text-2:          #475569;
+  --color-text-3:          #94a3b8;
+  --color-accent:          #6366f1;
+  --color-accent-hover:    #4f46e5;
+  --color-accent-surface:  rgba(99,102,241,0.08);
+  --color-accent-border:   rgba(99,102,241,0.2);
+  --color-success:         #16a34a;
+  --color-success-surface: rgba(34,197,94,0.07);
+  --color-gold:            #d97706;
+  --color-gold-surface:    rgba(217,119,6,0.07);
+  --color-danger:          #dc2626;
 
-  --font-serif: var(--font-instrument-serif), Georgia, serif;
-  --font-hand: var(--font-nunito), system-ui, sans-serif;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains-mono), monospace;
-  --font-cinzel: var(--font-cinzel), 'Cinzel', serif;
-  --font-cormorant: var(--font-cormorant), 'Cormorant Garamond', serif;
-}
-
-:root {
-  --color-cream: #faf7f2;
-  --color-parchment: #f0e9de;
-  --color-tan-light: #e8dfd3;
-  --color-tan-dark: #ddd2c2;
-  --color-amber: #d97706;
-  --color-amber-light: #fef3e2;
-  --color-gold: #b8860b;
-  --color-ink: #2d2a24;
-  --color-ink-body: #4a4539;
-  --color-ink-muted: #8a7a65;
-  --color-locked-bg: #f5f0e8;
+  /* Fonts */
+  --font-sans:   var(--font-inter), system-ui, -apple-system, sans-serif;
+  --font-serif:  var(--font-lora-var), Georgia, serif;
+  --font-study:  var(--font-eb-garamond-var), Georgia, serif;
+  --font-mono:   var(--font-jetbrains-mono), monospace;
 }
 
 body {
-  background-color: var(--color-cream);
-  color: var(--color-ink-body);
-  font-family: var(--font-inter), system-ui, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
 }
 
 .lined-paper {
   background-image: repeating-linear-gradient(
     transparent, transparent 31px,
-    var(--color-tan-light) 31px, var(--color-tan-light) 32px
+    rgba(15,23,42,0.06) 31px, rgba(15,23,42,0.06) 32px
   );
   background-size: 100% 32px;
   line-height: 32px;
 }
 
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--color-cream); }
-::-webkit-scrollbar-thumb { background: var(--color-tan-dark); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-ink-muted); }
+::-webkit-scrollbar-track { background: var(--color-surface); }
+::-webkit-scrollbar-thumb { background: var(--color-border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-3); }
