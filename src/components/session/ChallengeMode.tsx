@@ -104,7 +104,7 @@ export default function ChallengeMode({ topicId, topicTitle, sessionId }: Challe
         </div>
       )}
       {challenge && hasSubmitted && !explanation && (
-        <button onClick={requestExplanation} disabled={loading} className="rounded-md border-2 border-dashed border-gold bg-gold-surface px-4 py-3 text-sm font-medium text-gold transition-colors hover:bg-amber-light/40 disabled:opacity-50">Unlock Full Explanation</button>
+        <button onClick={requestExplanation} disabled={loading} className="rounded-md border-2 border-dashed border-gold bg-gold-surface px-4 py-3 text-sm font-medium text-gold transition-colors hover:bg-gold-surface/80 disabled:opacity-50">Unlock Full Explanation</button>
       )}
       {explanation && (
         <div className="rounded-lg border border-gold bg-white p-5 shadow-sm">
