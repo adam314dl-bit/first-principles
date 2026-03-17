@@ -1,22 +1,9 @@
 // src/components/session/Scratchpad.tsx
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import katex from "katex";
+import { renderMath } from "@/lib/renderMath";
 
 interface ScratchpadProps { sessionId: string; initialContent?: string; }
-
-function renderMathInText(text: string): string {
-  let result = text;
-  result = result.replace(/\$\$([\s\S]*?)\$\$/g, (_m, tex) => { try { return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false }); } catch { return `<span class="text-danger">[Math Error: ${tex}]</span>`; } });
-  result = result.replace(/\$([^$\n]+?)\$/g, (_m, tex) => { try { return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false }); } catch { return `<span class="text-danger">[Math Error: ${tex}]</span>`; } });
-  result = result.replace(/^### (.+)$/gm, '<h3 class="font-serif text-lg text-text mt-4 mb-2">$1</h3>');
-  result = result.replace(/^## (.+)$/gm, '<h2 class="font-serif text-xl text-text mt-4 mb-2">$1</h2>');
-  result = result.replace(/^# (.+)$/gm, '<h1 class="font-serif text-2xl text-text mt-4 mb-2">$1</h1>');
-  result = result.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  result = result.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  result = result.replace(/\n/g, "<br />");
-  return result;
-}
 
 export default function Scratchpad({ sessionId, initialContent = "" }: ScratchpadProps) {
   const [content, setContent] = useState(initialContent);
@@ -57,7 +44,7 @@ export default function Scratchpad({ sessionId, initialContent = "" }: Scratchpa
         </div>
         <div className="flex-1 overflow-y-auto bg-white p-4">
           {content
-            ? <div className="prose prose-sm max-w-none text-text-2" dangerouslySetInnerHTML={{ __html: renderMathInText(content) }} />
+            ? <div className="prose prose-sm max-w-none text-text-2" dangerouslySetInnerHTML={{ __html: renderMath(content) }} />
             : <p className="text-sm text-text-3">Preview will appear here as you type. Use $ for inline math and $$ for display math.</p>
           }
         </div>
