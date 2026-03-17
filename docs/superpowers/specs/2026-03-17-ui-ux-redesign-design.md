@@ -10,7 +10,7 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 ## Design Principles
 
 1. **Immersion when exploring, invisibility when studying** — the UI should feel like a game when browsing the cosmos, then strip away completely when learning.
-2. **Warm palette throughout** — no cold blues in the game UI. Gold, amber, crimson, ember orange.
+2. **Warm palette for game UI** — no cold blues in cosmos, navigation, overlays. Gold, amber, crimson, ember orange. Study mode is intentionally neutral (cool blue hint accent `#5b7bb5` is permitted for readability contrast against warm-free scholarly backgrounds).
 3. **Scholarly readability** — study mode uses editorial-grade serif typography with research-backed spacing for sustained reading comfort.
 4. **Progressive disclosure** — tools and controls appear only when needed, reducing cognitive load.
 
@@ -30,8 +30,9 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 | `--crimson` | `rgba(180,60,40,1)` | Boss nodes, danger |
 | `--ember` | `rgba(220,120,20,.3)` | Particle effects |
 | `--green-avail` | `rgba(120,200,80,1)` | Available nodes |
-| `--text-gold` | `rgba(200,160,60,.5)` | Primary text on dark |
-| `--text-muted-game` | `rgba(200,160,60,.15)` | Muted labels |
+| `--text-gold` | `rgba(200,160,60,.75)` | Primary readable text on dark (≥4.5:1 contrast) |
+| `--text-gold-decorative` | `rgba(200,160,60,.4)` | Decorative labels, non-essential text |
+| `--text-muted-game` | `rgba(200,160,60,.2)` | Very muted labels, ornamental |
 
 ### Study Palette — Light Mode
 
@@ -116,19 +117,31 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 - Inner border: thin gold line 6px from edge, `rgba(180,140,60,.05)`
 
 #### Node Rendering — Shield Shape
-- Replace circle rendering with shield polygon path:
+- Replace circle rendering with shield polygon path.
+- CSS equivalent: `polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%)`
+- **PixiJS implementation:** Given a node with half-width `hw` and half-height `hh` (where `hh = hw * 1.2` for the shield aspect ratio), centered at `(cx, cy)`, compute the 6 vertices:
   ```
-  polygon(50% 0%, 100% 20%, 100% 70%, 50% 100%, 0% 70%, 0% 20%)
+  const shieldPath = [
+    cx,        cy - hh,       // top center
+    cx + hw,   cy - hh * 0.6, // top-right
+    cx + hw,   cy + hh * 0.4, // bottom-right
+    cx,        cy + hh,       // bottom center
+    cx - hw,   cy + hh * 0.4, // bottom-left
+    cx - hw,   cy - hh * 0.6, // top-left
+  ];
+  graphics.poly(shieldPath);
+  graphics.fill({ color, alpha });
+  graphics.stroke({ color: borderColor, width: borderWidth, alpha: borderAlpha });
   ```
-- In PixiJS: draw via `Graphics.poly()` with the 6-point shield vertices
-- Node sizes: Galaxy 56px, Mastered 36px, Available 28px, Locked 20px, Boss 48px
+- Node sizes (width × height): Galaxy 56×67px, Mastered 36×43px, Available 28×34px, Locked 20×24px, Boss 48×58px
 
 #### Node Colors by Status
-- **Mastered:** Gold fill `rgba(200,160,60,.08)`, gold border `rgba(200,160,60,.2)`, gold glow
-- **Available:** Green fill `rgba(120,200,80,.06)`, green border `rgba(120,200,80,.15)`, float animation
-- **Boss:** Crimson fill `rgba(180,40,40,.06)`, crimson border `rgba(180,60,40,.15)`, double border
-- **Locked:** Near-invisible `rgba(200,160,60,.02)` fill, `rgba(200,160,60,.03)` border
-- **Galaxy:** Largest shield, gold with pulsing glow animation
+- **Mastered:** Gold fill `rgba(200,160,60,.08)`, gold border `rgba(200,160,60,.2)`, gold glow `0 0 20px rgba(200,140,40,.1)`
+- **In-progress:** Amber fill `rgba(200,160,60,.05)`, amber border `rgba(200,160,60,.15)`, subtle pulse animation (alpha 0.6-0.9)
+- **Available:** Green fill `rgba(120,200,80,.06)`, green border `rgba(120,200,80,.15)`, float animation (translateY ±4px, 3s)
+- **Boss:** Crimson fill `rgba(180,40,40,.06)`, crimson border `rgba(180,60,40,.15)`, double border (outer ring 4px offset)
+- **Locked:** Near-invisible `rgba(200,160,60,.02)` fill, `rgba(200,160,60,.03)` border, no label
+- **Galaxy:** Largest shield, gold with pulsing glow animation (box-shadow oscillates 8-20px spread)
 
 #### Connection Lines
 - Color: warm gold `rgba(200,160,60,.06)` for visible, near-invisible for locked
@@ -140,9 +153,9 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 - Alpha: 0.15-0.3, warm orange color
 
 #### Labels
-- Cinzel font rendered as bitmap text in PixiJS
+- Use PixiJS `Text` with standard web fonts (Cinzel loaded via Google Fonts in the page). PixiJS 8 `Text` renders web fonts onto canvas — no bitmap font atlas needed. The fonts are already loaded by `layout.tsx` so they are available when PixiJS renders.
 - Gold tint matching node status
-- Letter-spacing 2px, uppercase, 6-8px
+- Style: `fontFamily: 'Cinzel'`, `fontSize: 6-8`, `fill: statusColor`, `letterSpacing: 2`, `textTransform` applied manually (`.toUpperCase()`)
 
 ### 3. ZoomOverlay — Fantasy Panel
 
@@ -166,10 +179,11 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 ```
 
 **Status-specific styles:**
-- Available: green status text, green primary button
-- Mastered: gold status, "REVIEW →" button text
-- Boss: crimson orb, crimson "★ BOSS CHALLENGE" button
-- Locked: dim everything, no action button
+- **Available:** green status text `rgba(120,200,80,.3)`, green primary button border, orb glow green
+- **In-progress:** amber status text `rgba(200,160,60,.3)`, "CONTINUE SESSION →" button, orb glow amber
+- **Mastered:** gold status text, "REVIEW →" button text, orb glow gold
+- **Boss:** crimson status text `rgba(200,80,60,.3)`, crimson "★ BOSS CHALLENGE" button, orb glow crimson
+- **Locked:** dim everything (all elements at 30% opacity), no action button, status text "Prerequisites required"
 
 ### 4. Study Session — Minimal Scholar
 
@@ -185,8 +199,8 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 
 #### Dark/Light Toggle
 - Small sun/moon icon button in the study topbar
-- Persisted per-session (or use system preference)
-- Toggles CSS variables on the study container
+- **Persistence:** `localStorage` key `study-theme` with values `"light"` or `"dark"`. Falls back to `"light"` if no preference stored. Checked on mount via `useEffect` to avoid hydration mismatch.
+- **Implementation:** Toggles a `data-study-theme="dark"` attribute on the session page container. CSS variables are scoped under `[data-study-theme="dark"]` selector in `study-theme.css`.
 
 #### Challenge Mode
 - **Challenge card:** EB Garamond 17px, 1.85 line height, max-width 680px
@@ -211,35 +225,108 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 
 **File:** `src/app/journal/page.tsx`
 
-- Dark warm background matching cosmos
-- Session history cards with gold ornamental borders
-- Cinzel headings, Cormorant Garamond for summaries
-- Date labels in muted gold
-- Mastery indicators using shield-shaped progress markers
+**Layout:**
+```
+[Full-page bg: --game-bg]
+  [Page header]
+    [Cinzel 14px 600, "JOURNAL OF DISCOVERY", --text-gold-decorative]
+    [Cormorant italic 12px, "A record of your journey", --text-muted-game]
+  [Session list — vertical stack, 12px gap]
+    [Session card — for each completed session]
+```
+
+**Session Card Structure:**
+- Background: `--game-surface` with `1px solid rgba(180,140,60,.08)` border
+- Padding: 20px 24px
+- **Header row:** Topic name (Cinzel 13px 600, `--text-gold`), date (Cormorant italic 11px, `--text-muted-game`), mastery shield icon (tiny 16×19px shield filled to mastery level)
+- **Summary:** Cormorant Garamond 14px 400, `--text-gold-decorative`, line-height 1.7, max 3 lines with overflow ellipsis
+- **Footer row:** Session duration (Cormorant italic 11px), mode badge ("Challenge" or "Dialogue" in Cinzel 8px, letter-spacing 2px, gold outline pill)
+- **Date group headers:** When sessions span multiple days, group with a thin divider and date label (Cinzel 9px, letter-spacing 3px, `--text-muted-game`)
 
 ### 6. Playground Page — Fantasy Themed
 
 **File:** `src/app/playground/page.tsx`
 
-- Dark warm background
-- Review challenge cards framed with fantasy gold borders
-- Challenge type labels (teach-it, what-if, connect) as ornamental badges
-- Cinzel headings, warm color coding
+**Layout:**
+```
+[Full-page bg: --game-bg]
+  [Page header]
+    [Cinzel 14px 600, "THE PROVING GROUNDS", --text-gold-decorative]
+    [Cormorant italic 12px, "Test your mastery", --text-muted-game]
+  [Available topics grid — 2 columns, 16px gap]
+    [Topic card — for each mastered topic]
+```
+
+**Topic Card Structure:**
+- Background: `--game-surface` with `1px solid rgba(180,140,60,.08)` border
+- Padding: 24px
+- **Topic name:** Cinzel 14px 600, `--text-gold`
+- **Mastery level:** Row of 5 small shields (12×14px each), filled shields for earned levels, outline for remaining
+- **Challenge type buttons** (shown based on mastery level):
+  - Mastery ≥2: "TEACH IT" — Cinzel 9px, letter-spacing 2px, gold outline button
+  - Mastery ≥3: "WHAT IF?" — same style, amber tint
+  - Mastery ≥4: "CONNECT" — same style, green tint
+  - Each button: `padding: 8px 20px`, `border: 1px solid` with status color at `.12` alpha
+- **Locked challenges:** Same button shape but dimmed (opacity .3), tooltip "Reach mastery level X"
 
 ### 7. Transition Animation
 
+**Mechanism:** The current flow uses `<a href>` for full page navigation. We keep full page navigation (no client-side router hacks needed). The transition effect is achieved by:
+1. Each page applies its own background immediately on mount (game pages set `--game-bg`, study pages set their study bg).
+2. A CSS `animation: fadeIn 300ms ease-out` on the main content container provides a subtle entrance.
+3. The ZoomOverlay "airlock" creates the psychological transition — users see topic info in fantasy style, then consciously choose to enter study mode.
+
 **From Cosmos → Study:**
-1. User clicks shield node → ZoomOverlay appears (fantasy styled)
-2. User clicks "⚔ BEGIN SESSION" → 400ms cross-dissolve:
-   - Fantasy overlay fades out
-   - Background shifts from warm dark to study bg (light or dark)
-   - TopBar morphs from fantasy to study bar
-3. Study session renders with clean scholarly UI
+1. User clicks shield node → ZoomOverlay appears with 500ms zoom-in animation (fantasy styled)
+2. User clicks "⚔ BEGIN SESSION" → standard `<a href="/session/[id]">` navigation
+3. Session page mounts with `animation: fadeIn 300ms ease-out` — clean study UI appears
+4. Body background is set by the session page layout (not inherited from cosmos)
 
 **From Study → Cosmos:**
-1. User clicks "← Cosmos" or "End Session"
-2. 300ms fade back to cosmos view
-3. If mastered, trigger celebration animation on the node
+1. User clicks "← Cosmos" or "End Session" → standard `<a href>` or `window.location` navigation
+2. Cosmos page mounts, PixiJS initializes (existing loading state: "CHARTING THE COSMOS...")
+3. If `?mastered=topicId` param present, auto-select that node and show celebration
+
+**No View Transitions API or shared layout transitions needed.** The "airlock" pattern (ZoomOverlay) provides the mental transition. The actual page navigation is instant.
+
+## Error & Loading States
+
+### Game Mode (Cosmos, Journal, Playground)
+- **Loading spinners:** Gold-colored ring spinner (`border: 2px solid rgba(200,160,60,.1)`, `border-top-color: rgba(200,160,60,.5)`), with Cormorant italic loading text in `--text-gold-decorative`
+- **Error messages:** Crimson-tinted card (`background: rgba(180,60,40,.06)`, `border: 1px solid rgba(180,60,40,.12)`, `color: rgba(220,100,80,.6)`)
+- **Empty states:** Cormorant Garamond italic, centered, `--text-muted-game`
+
+### Study Mode (Challenge, Dialogue)
+- **Loading spinners:** `--study-accent` colored ring spinner (light mode) or `--study-accent-dark` (dark mode), with Inter loading text
+- **Error messages:** Light mode: `background: #fef2f2`, `border: 1px solid rgba(220,60,60,.15)`, `color: #b91c1c`. Dark mode: `background: rgba(220,60,60,.04)`, `border: 1px solid rgba(220,60,60,.1)`, `color: rgba(220,120,120,.6)`
+- **Empty states:** EB Garamond italic, centered, muted text
+
+## Body Background Strategy
+
+The `body` background in `globals.css` is removed. Instead, each page/layout sets its own background:
+
+- **Cosmos page (`/tree`):** Sets `bg-[#080604]` on its root container (already does `bg-[#020108]`, just changes the color)
+- **Session page (`/session/*`):** Sets study background via `data-study-theme` attribute — light `#fdfdfc` or dark `#111118`
+- **Journal page (`/journal`):** Sets `bg-[#080604]` (game theme)
+- **Playground page (`/playground`):** Sets `bg-[#080604]` (game theme)
+- **Root layout:** `body` gets `bg-[#080604]` as the default (game theme), so any unthemed pages default to dark
+
+## Cosmos Overlay Text Colors
+
+The existing HTML overlays in `CosmosTree.tsx` (title, subtitle, loading text) shift from cool blue-grey to warm gold:
+
+| Element | Current Color | New Color |
+|---------|--------------|-----------|
+| Title "THE PHYSICS COSMOS" | `rgba(160,170,200,.35)` | `rgba(200,160,60,.25)` |
+| Subtitle "scroll to zoom..." | `rgba(120,130,160,.2)` | `rgba(200,160,60,.12)` |
+| Loading "CHARTING THE COSMOS..." | `rgba(140,150,180,.25)` | `rgba(200,160,60,.2)` |
+
+## TopBar Ornament Positioning
+
+- Corner diamond `◆`: `font-size: 8px`, `color: rgba(180,140,60,.2)`, positioned via `::before` (left) and `::after` (right) pseudo-elements
+- Left diamond: `position: absolute; left: 10px; top: 50%; transform: translateY(-50%)`
+- Right diamond: `position: absolute; right: 10px; top: 50%; transform: translateY(-50%)`
+- Inner top highlight: `box-shadow: inset 0 1px 0 rgba(180,140,60,.08)` on the nav container
 
 ## Files to Create
 
@@ -265,6 +352,7 @@ Redesign First Principles into a dual-mode interface: an immersive Dark Fantasy 
 | `src/components/session/DialogueMode.tsx` | Scholar chat bubbles |
 | `src/components/session/Scratchpad.tsx` | Adapt to dark/light |
 | `src/components/session/ModeToggle.tsx` | Restyle for study bar |
+| `src/components/layout/SplitPane.tsx` | Adapt borders/backgrounds to study theme (light + dark) |
 | `src/app/journal/page.tsx` | Fantasy theme |
 | `src/app/playground/page.tsx` | Fantasy theme |
 
