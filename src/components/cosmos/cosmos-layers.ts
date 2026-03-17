@@ -7,19 +7,19 @@ import { drawNodeIcon } from "./cosmos-icons";
 
 // ═══ COLOR CONSTANTS ═══
 const DOMAIN_COLORS: Record<string, number> = {
-  core: 0xc4a55a,
-  mechanics: 0x8ab0d0,
-  em: 0xc04848,
-  waves: 0x50a0a0,
-  thermo: 0xc09050,
-  modern: 0x6080a0,
+  core: 0x6366f1,
+  mechanics: 0x6366f1,
+  em: 0x6366f1,
+  waves: 0x6366f1,
+  thermo: 0x6366f1,
+  modern: 0x6366f1,
 };
 
 const STATUS_COLORS: Record<string, number> = {
-  mastered: 0x8ab0d0,
-  "in-progress": 0xd0a060,
-  available: 0x60b880,
-  locked: 0x5060a0,
+  mastered: 0x6366f1,
+  "in-progress": 0x6366f1,
+  available: 0x6366f1,
+  locked: 0xffffff,
 };
 
 const NEBULA_CONFIGS: Array<{ x: number; y: number; r: number; color: number; alpha: number }> = [
@@ -101,14 +101,15 @@ export function createConnections(
     const vb = visibility.get(b.id) ?? "fogged";
     if (va === "fogged" && vb === "fogged") continue;
 
-    let alpha = 0.03;
+    let alpha = 0.02;
     let width = 0.7;
-    if (va === "bright" && vb === "bright") { alpha = 0.1; width = 1.5; }
-    else if ((va === "bright" && vb === "frontier") || (va === "frontier" && vb === "bright")) { alpha = 0.07; width = 1.2; }
-    else if (va === "dim" || vb === "dim") { alpha = 0.025; width = 0.5; }
+    if (va === "bright" && vb === "bright") { alpha = 0.30; width = 1.5; }
+    else if ((va === "bright" && vb === "frontier") || (va === "frontier" && vb === "bright")) { alpha = 0.04; width = 1.0; }
+    else if (va === "dim" || vb === "dim") { alpha = 0.02; width = 0.5; }
 
     const g = new Graphics();
-    g.moveTo(cx + a.cosmosX, cy + a.cosmosY).lineTo(cx + b.cosmosX, cy + b.cosmosY).stroke({ width, color: 0x8090c0, alpha });
+    const connColor = (va === "bright" && vb === "bright") ? 0x6366f1 : 0xffffff;
+    g.moveTo(cx + a.cosmosX, cy + a.cosmosY).lineTo(cx + b.cosmosX, cy + b.cosmosY).stroke({ width, color: connColor, alpha });
     container.addChild(g);
   }
 
@@ -141,7 +142,7 @@ export function createParticles(
 
     for (let i = 0; i < 2; i++) {
       const g = new Graphics();
-      g.circle(0, 0, 1).fill({ color: 0xa0b0e0, alpha: 0.3 });
+      g.circle(0, 0, 1).fill({ color: 0x8b9cf6, alpha: 0.2 });
       container.addChild(g);
       particles.push({
         graphics: g,
@@ -182,14 +183,17 @@ export function createNodes(
 
     const r = node.cosmosRadius;
     const isInteractive = vis === "bright" || vis === "frontier";
-    const color = vis === "bright"
-      ? (node.nodeType === "boss" ? 0xc04030 : (DOMAIN_COLORS[node.domain] ?? 0x8ab0d0))
-      : vis === "frontier"
-        ? 0x60b880
-        : 0x5060a0;
+    const color = vis === "dim"
+      ? 0xffffff   // locked/near-invisible: white
+      : node.nodeType === "boss"
+        ? 0xd97706  // boss: gold
+        : 0x6366f1; // all others: indigo
 
-    const alphaMap: Record<VisibilityState, number> = { bright: 1, frontier: 0.8, dim: 0.15, fogged: 0 };
-    const baseAlpha = alphaMap[vis];
+    const fillAlphaMap: Record<VisibilityState, number> = { bright: 0.10, frontier: 0.05, dim: 0.02, fogged: 0 };
+    const strokeAlphaMap: Record<VisibilityState, number> = { bright: 0.40, frontier: 0.25, dim: 0.04, fogged: 0 };
+    const fillAlpha = fillAlphaMap[vis];
+    const strokeAlpha = strokeAlphaMap[vis];
+    const baseAlpha = strokeAlpha; // used for inner ring and glow below
 
     // Outer glow (only for bright/frontier)
     if (vis !== "dim") {
@@ -201,20 +205,21 @@ export function createNodes(
 
     // Main circle
     const main = new Graphics();
-    main.circle(0, 0, r).fill({ color: 0x060410, alpha: 0.9 });
-    main.circle(0, 0, r).stroke({ width: node.nodeType === "boss" ? 2.5 : 1.8, color, alpha: baseAlpha * 0.8 });
+    main.circle(0, 0, r).fill({ color, alpha: fillAlpha });
+    main.circle(0, 0, r).stroke({ width: node.nodeType === "boss" ? 2.5 : 1.8, color, alpha: strokeAlpha });
     nc.addChild(main);
 
     // Inner ring (not for dim)
     if (vis !== "dim") {
       const inner = new Graphics();
-      inner.circle(0, 0, r * 0.7).stroke({ width: 0.5, color, alpha: baseAlpha * 0.3 });
+      inner.circle(0, 0, r * 0.7).stroke({ width: 0.5, color, alpha: strokeAlpha * 0.3 });
       nc.addChild(inner);
     }
 
     // Physics icon
     const icon = new Graphics();
-    drawNodeIcon(icon, node.id, r, color, baseAlpha * (vis === "dim" ? 0.4 : 0.6));
+    const iconAlpha = vis === "dim" ? 0.08 : vis === "bright" ? 0.5 : 0.35;
+    drawNodeIcon(icon, node.id, r, color, iconAlpha);
     nc.addChild(icon);
 
     // Boss corona rays
