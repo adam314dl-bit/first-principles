@@ -1,27 +1,13 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
-import { Cinzel, Cormorant_Garamond, Inter, JetBrains_Mono, Nunito } from "next/font/google";
-import localFont from "next/font/local";
+import { Inter, JetBrains_Mono, Lora, EB_Garamond } from "next/font/google";
 import TopBar from "@/components/TopBar";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains-mono", display: "swap" });
-const instrumentSerif = localFont({ src: "./fonts/InstrumentSerif-Regular.ttf", variable: "--font-instrument-serif", display: "swap" });
-const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: "swap" });
-const cinzel = Cinzel({
-  subsets: ["latin"],
-  variable: "--font-cinzel",
-  display: "swap",
-  weight: ["400", "600", "700"],
-});
-const cormorantGaramond = Cormorant_Garamond({
-  subsets: ["latin"],
-  weight: ["400", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-cormorant",
-  display: "swap",
-});
+const lora = Lora({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-lora-var", display: "swap" });
+const ebGaramond = EB_Garamond({ subsets: ["latin"], weight: ["400", "500"], style: ["normal", "italic"], variable: "--font-eb-garamond-var", display: "swap" });
 
 export const metadata: Metadata = {
   title: "First Principles",
@@ -31,7 +17,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSerif.variable} ${nunito.variable} ${cinzel.variable} ${cormorantGaramond.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} ${lora.variable} ${ebGaramond.variable} font-sans antialiased`}>
         <TopBar />
         <main>{children}</main>
       </body>
