@@ -6,62 +6,127 @@ interface ZoomOverlayProps {
   onClose: () => void;
 }
 
-const TYPE_STYLES: Record<string, { bg: string; border: string; label: string; btnClass: string }> = {
-  mastered: { bg: "rgba(20,22,40,.9)", border: "rgba(160,170,210,.25)", label: "Mastered", btnClass: "border-blue-400/20 text-blue-300/50 hover:bg-blue-400/10" },
-  available: { bg: "rgba(12,20,14,.9)", border: "rgba(90,180,120,.25)", label: "Available — Ready to learn", btnClass: "border-green-400/20 text-green-300/50 hover:bg-green-400/10" },
-  "in-progress": { bg: "rgba(20,16,10,.9)", border: "rgba(200,160,80,.25)", label: "In Progress", btnClass: "border-amber-400/20 text-amber-300/50 hover:bg-amber-400/10" },
-  locked: { bg: "rgba(10,10,18,.9)", border: "rgba(80,85,120,.15)", label: "Locked", btnClass: "" },
+interface StatusConfig {
+  label: string;
+  pillBg: string;
+  pillText: string;
+  circleBg: string;
+  circleBorder: string;
+  actionLabel: string;
+}
+
+const STATUS_CONFIG: Record<string, StatusConfig> = {
+  mastered: {
+    label: "Mastered",
+    pillBg: "bg-success-surface", pillText: "text-success",
+    circleBg: "rgba(22,163,74,0.12)", circleBorder: "rgba(22,163,74,0.3)",
+    actionLabel: "Review →",
+  },
+  available: {
+    label: "Available — Ready to learn",
+    pillBg: "bg-accent-surface", pillText: "text-accent",
+    circleBg: "rgba(99,102,241,0.12)", circleBorder: "rgba(99,102,241,0.3)",
+    actionLabel: "Begin Session →",
+  },
+  "in-progress": {
+    label: "In Progress",
+    pillBg: "bg-accent-surface", pillText: "text-accent",
+    circleBg: "rgba(99,102,241,0.12)", circleBorder: "rgba(99,102,241,0.3)",
+    actionLabel: "Continue →",
+  },
+  locked: {
+    label: "Locked",
+    pillBg: "bg-surface-alt", pillText: "text-text-3",
+    circleBg: "rgba(148,163,184,0.12)", circleBorder: "rgba(148,163,184,0.3)",
+    actionLabel: "",
+  },
 };
 
-const BOSS_STYLE = { bg: "rgba(25,10,8,.9)", border: "rgba(180,60,40,.25)", label: "★ Boss Challenge", btnClass: "border-red-400/20 text-red-300/50 hover:bg-red-400/10" };
+const BOSS_CONFIG: StatusConfig = {
+  label: "★ Boss Challenge",
+  pillBg: "bg-gold-surface", pillText: "text-gold",
+  circleBg: "rgba(217,119,6,0.12)", circleBorder: "rgba(217,119,6,0.3)",
+  actionLabel: "Accept Challenge →",
+};
 
 export default function ZoomOverlay({ node, onClose }: ZoomOverlayProps) {
   if (!node) return null;
 
-  const style = node.nodeType === "boss" ? BOSS_STYLE : (TYPE_STYLES[node.status] ?? TYPE_STYLES.locked);
-  const mastery = node.masteryLevel * 20; // 0-5 → 0-100%
-
-  const actionLabel = node.nodeType === "boss" ? "⚔  ACCEPT CHALLENGE" : node.status === "mastered" ? "REVIEW →" : "BEGIN SESSION →";
+  const cfg = node.nodeType === "boss" ? BOSS_CONFIG : (STATUS_CONFIG[node.status] ?? STATUS_CONFIG.locked);
+  const mastery = node.masteryLevel * 20; // 0–5 → 0–100%
+  const showAction = node.status !== "locked";
 
   return (
     <div
-      className={`fixed inset-0 z-30 flex items-center justify-center transition-all duration-500 ${node ? "bg-[rgba(2,1,8,.88)]" : "bg-transparent pointer-events-none"}`}
+      className="fixed inset-0 z-30 flex items-center justify-center"
+      style={{ background: "rgba(15,23,42,0.65)", backdropFilter: "blur(8px)" }}
       onClick={onClose}
     >
       <div
-        className="text-center p-10 max-w-[500px] animate-in zoom-in-95 duration-500"
+        className="relative w-full mx-4 bg-white rounded-2xl p-8"
+        style={{ maxWidth: 440, border: "1px solid var(--color-border)", boxShadow: "0 20px 60px rgba(15,23,42,0.25)" }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Star orb */}
-        <div
-          className="w-[90px] h-[90px] rounded-full mx-auto mb-5 relative"
-          style={{ background: style.bg, border: `2px solid ${style.border}`, boxShadow: `0 0 50px ${style.border}` }}
+        {/* × close button — top right */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-text-3 text-xl leading-none hover:text-text-2 cursor-pointer border-none bg-transparent"
+          aria-label="Close"
         >
-          <div className="absolute -inset-2 rounded-full border animate-pulse" style={{ borderColor: "rgba(80,90,140,.1)" }} />
-          <div className="absolute -inset-[18px] rounded-full border animate-pulse" style={{ borderColor: "rgba(80,90,140,.06)", animationDelay: "0.4s" }} />
-          <div className="absolute -inset-[30px] rounded-full border animate-pulse" style={{ borderColor: "rgba(80,90,140,.03)", animationDelay: "0.8s" }} />
+          ×
+        </button>
+
+        {/* Status icon — replaces the 90px animated orb */}
+        <div className="flex justify-center mb-6">
+          <div
+            className="w-10 h-10 rounded-full"
+            style={{ background: cfg.circleBg, border: `1.5px solid ${cfg.circleBorder}` }}
+          />
         </div>
 
-        <h2 className="font-[family-name:var(--font-cinzel)] text-[22px] text-[rgba(200,210,240,.55)] tracking-[3px] mb-1.5">{node.title}</h2>
-        <p className="font-[family-name:var(--font-cormorant)] italic text-[13px] text-[rgba(140,150,180,.3)] tracking-wide mb-4">{style.label}</p>
-        <p className="font-[family-name:var(--font-cormorant)] text-sm text-[rgba(160,170,200,.3)] leading-relaxed mb-6">{node.description}</p>
+        {/* Status pill */}
+        <div className="flex justify-center mb-3">
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-widest ${cfg.pillBg} ${cfg.pillText}`}>
+            {cfg.label}
+          </span>
+        </div>
+
+        {/* Title */}
+        <h2 className="font-serif text-[20px] font-bold text-text leading-tight text-center mb-1">{node.title}</h2>
+
+        {/* Domain */}
+        {node.domain && (
+          <p className="text-[13px] text-text-3 text-center mb-4">{node.domain}</p>
+        )}
+
+        {/* Description */}
+        <p className="text-[14px] text-text-2 leading-relaxed mb-6">{node.description}</p>
 
         {/* Mastery bar */}
-        <div className="mb-5">
-          <div className="font-[family-name:var(--font-cinzel)] text-[9px] text-[rgba(120,130,160,.2)] tracking-[2px] mb-1.5">MASTERY</div>
-          <div className="h-[3px] bg-[rgba(80,90,140,.06)] rounded max-w-[300px] mx-auto overflow-hidden">
-            <div className="h-full rounded transition-all duration-600" style={{ width: `${mastery}%`, background: style.border }} />
+        <div className="mb-6">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.1em] text-text-3 mb-1.5">Mastery</div>
+          <div className="h-1.5 bg-surface-alt rounded-full overflow-hidden">
+            <div
+              className="h-full bg-accent rounded-full transition-all duration-300"
+              style={{ width: `${mastery}%` }}
+            />
           </div>
         </div>
 
         {/* Buttons */}
-        <div className="flex gap-2.5 justify-center">
-          <button onClick={onClose} className="px-5 py-2.5 border border-[rgba(80,90,140,.12)] rounded bg-[rgba(80,90,140,.04)] text-[rgba(180,190,220,.4)] font-[family-name:var(--font-cinzel)] text-[11px] tracking-[2px] cursor-pointer hover:bg-[rgba(80,90,140,.1)] transition-all">
-            BACK TO COSMOS
+        <div className="flex gap-2.5">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2.5 rounded-md border border-border bg-white text-[13px] font-medium text-text hover:bg-surface transition-colors cursor-pointer"
+          >
+            Close
           </button>
-          {node.status !== "locked" && (
-            <a href={`/session/${node.id}`} className={`px-5 py-2.5 border rounded bg-transparent font-[family-name:var(--font-cinzel)] text-[11px] tracking-[2px] cursor-pointer transition-all no-underline ${style.btnClass}`}>
-              {actionLabel}
+          {showAction && (
+            <a
+              href={`/session/${node.id}`}
+              className="flex-1 px-4 py-2.5 rounded-md bg-accent text-[13px] font-medium text-white text-center hover:bg-accent-hover transition-colors no-underline"
+            >
+              {cfg.actionLabel}
             </a>
           )}
         </div>
