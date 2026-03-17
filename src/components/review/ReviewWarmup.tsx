@@ -44,22 +44,22 @@ export default function ReviewWarmup({ topicId, topicTitle, reviewType, sessionI
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-lg rounded-xl bg-parchment p-6 shadow-xl">
+      <div className="w-full max-w-lg rounded-xl bg-surface p-6 shadow-xl">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-serif text-xl text-ink">Warm-up Challenge</h2>
+          <h2 className="font-serif text-xl text-text">Warm-up Challenge</h2>
           <button
             onClick={onDismiss}
-            className="rounded-md border border-tan-dark bg-white px-3 py-1 text-sm text-ink-muted hover:bg-tan-light"
+            className="rounded-md border border-border bg-surface-alt px-3 py-1 text-sm text-text-3 hover:bg-surface-alt"
           >
             Skip
           </button>
         </div>
-        <p className="mb-4 text-sm text-ink-muted">
+        <p className="mb-4 text-sm text-text-3">
           Before your session, here&apos;s a quick review from a topic you&apos;ve mastered.
         </p>
         {loading && (
-          <div className="flex items-center gap-2 text-sm text-ink-muted">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+          <div className="flex items-center gap-2 text-sm text-text-3">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
             Loading challenge...
           </div>
         )}

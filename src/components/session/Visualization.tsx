@@ -54,17 +54,17 @@ export default function Visualization({ topicId, topicTitle }: VisualizationProp
   };
 
   return (
-    <div className="rounded-lg border border-tan-light bg-white p-5 shadow-sm">
+    <div className="rounded-lg border border-border bg-surface p-5 shadow-sm">
       <div className="mb-3 flex items-center justify-between">
         <div>
-          <h3 className="font-serif text-lg text-ink">Visualization</h3>
-          <p className="text-sm text-ink-muted">Explore {topicTitle} visually</p>
+          <h3 className="font-serif text-lg text-text">Visualization</h3>
+          <p className="text-sm text-text-3">Explore {topicTitle} visually</p>
         </div>
         {!code && (
           <button
             onClick={generate}
             disabled={loading}
-            className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber/90 disabled:opacity-50"
+            className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {loading ? "Generating..." : "Generate"}
           </button>
@@ -73,14 +73,14 @@ export default function Visualization({ topicId, topicTitle }: VisualizationProp
           <div className="flex gap-2">
             <button
               onClick={() => setExpanded((e) => !e)}
-              className="rounded-md border border-tan-dark bg-parchment px-3 py-1 text-sm text-ink-muted hover:bg-tan-light"
+              className="rounded-md border border-border bg-surface-alt px-3 py-1 text-sm text-text-3 hover:bg-surface-alt"
             >
               {expanded ? "Collapse" : "Expand"}
             </button>
             <button
               onClick={generate}
               disabled={loading}
-              className="rounded-md border border-tan-dark bg-parchment px-3 py-1 text-sm text-ink-muted hover:bg-tan-light disabled:opacity-50"
+              className="rounded-md border border-border bg-surface-alt px-3 py-1 text-sm text-text-3 hover:bg-surface-alt disabled:opacity-50"
             >
               Regenerate
             </button>
@@ -93,14 +93,14 @@ export default function Visualization({ topicId, topicTitle }: VisualizationProp
       )}
 
       {loading && !code && (
-        <div className="flex items-center gap-2 text-sm text-ink-muted">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+        <div className="flex items-center gap-2 text-sm text-text-3">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
           Generating interactive visualization...
         </div>
       )}
 
       {code && (
-        <div className={`mt-3 overflow-hidden rounded-md border border-tan-light ${expanded ? "h-[600px]" : "h-64"} transition-all duration-300`}>
+        <div className={`mt-3 overflow-hidden rounded-md border border-border ${expanded ? "h-[600px]" : "h-64"} transition-all duration-300`}>
           <iframe
             src={getBlobUrl(code)}
             title={`Visualization for ${topicTitle}`}
