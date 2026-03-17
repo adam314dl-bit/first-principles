@@ -88,8 +88,8 @@ export default function PlaygroundPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <h1 className="font-serif text-3xl text-ink">Playground</h1>
-      <p className="mt-2 text-ink-muted">Browse review challenges like a game menu — sorted by fun, not urgency.</p>
+      <h1 className="font-serif text-3xl text-text">Playground</h1>
+      <p className="mt-2 text-text-3">Browse review challenges like a game menu — sorted by fun, not urgency.</p>
 
       {/* Filter buttons */}
       <div className="mt-6 flex flex-wrap gap-2">
@@ -99,8 +99,8 @@ export default function PlaygroundPage() {
             onClick={() => setFilter(f)}
             className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               filter === f
-                ? "bg-amber text-white"
-                : "border border-tan-dark bg-white text-ink-muted hover:bg-parchment"
+                ? "bg-accent text-white"
+                : "border border-border bg-surface-alt text-text-2 hover:border-border-strong"
             }`}
           >
             {FILTER_LABELS[f]}
@@ -110,13 +110,13 @@ export default function PlaygroundPage() {
 
       {loading && (
         <div className="mt-8 flex h-48 items-center justify-center">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
         </div>
       )}
 
       {!loading && filteredTopics.length === 0 && (
-        <div className="mt-8 flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-tan-dark bg-parchment">
-          <p className="font-hand text-xl text-ink-muted">No mastered topics yet</p>
+        <div className="mt-8 flex h-48 items-center justify-center rounded-lg border-2 border-dashed border-border bg-surface">
+          <p className="text-xl text-text-3">No mastered topics yet</p>
         </div>
       )}
 
@@ -125,14 +125,14 @@ export default function PlaygroundPage() {
           {filteredTopics.map((topic) => {
             const availableTypes = getAvailableReviewTypes(topic.masteryLevel);
             return (
-              <div key={topic.id} className="rounded-lg border border-tan-light bg-white p-5 shadow-sm">
+              <div key={topic.id} className="rounded-lg border border-border bg-white p-5 shadow-sm">
                 <div className="mb-2 flex items-start justify-between">
-                  <h3 className="font-serif text-lg text-ink">{topic.title}</h3>
+                  <h3 className="font-serif text-lg text-text">{topic.title}</h3>
                   {topic.hasConnectionOpportunity && (
                     <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-700">Connect</span>
                   )}
                 </div>
-                <p className="mb-3 text-xs text-ink-muted">Mastery {topic.masteryLevel}/5</p>
+                <p className="mb-3 text-xs text-text-3">Mastery {topic.masteryLevel}/5</p>
                 <div className="flex flex-wrap gap-2">
                   {REVIEW_TYPES.filter((rt) => {
                     if (filter !== "all") return rt === filter && availableTypes.includes(rt);
@@ -142,7 +142,7 @@ export default function PlaygroundPage() {
                       key={rt}
                       onClick={() => handleLaunchChallenge(topic, rt)}
                       disabled={challengeLoading}
-                      className="rounded-md border border-tan-dark bg-parchment px-3 py-1 text-xs font-medium text-ink-body hover:bg-tan-light disabled:opacity-50"
+                      className="rounded-md border border-accent-border bg-transparent px-3 py-1 text-xs font-medium text-accent hover:bg-accent-surface disabled:opacity-50"
                     >
                       {rt === "teach-it" ? "Teach It" : rt === "what-if" ? "What If?" : "Connect"}
                     </button>
@@ -157,11 +157,11 @@ export default function PlaygroundPage() {
       {/* Challenge modal */}
       {activeChallenge && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg rounded-xl bg-parchment p-6 shadow-xl">
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
             <div className="mb-4 flex justify-end">
               <button
                 onClick={() => setActiveChallenge(null)}
-                className="rounded-md border border-tan-dark bg-white px-3 py-1 text-sm text-ink-muted hover:bg-tan-light"
+                className="rounded-md border border-border bg-surface px-3 py-1 text-sm text-text-3 hover:bg-surface-alt"
               >
                 Close
               </button>

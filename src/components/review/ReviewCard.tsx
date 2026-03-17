@@ -65,12 +65,12 @@ export default function ReviewCard({ challenge, reviewType, topicId, topicTitle,
   return (
     <div className={`rounded-lg border-2 ${TYPE_COLORS[reviewType]} bg-white p-5 shadow-sm`}>
       <div className="mb-3 flex items-center justify-between">
-        <span className="rounded-full bg-parchment px-3 py-1 text-xs font-semibold text-ink-muted">
+        <span className="rounded-full bg-accent-surface px-3 py-1 text-xs font-semibold text-accent">
           {TYPE_LABELS[reviewType]}
         </span>
-        <span className="font-serif text-sm text-ink">{topicTitle}</span>
+        <span className="font-serif text-sm text-text">{topicTitle}</span>
       </div>
-      <p className="mb-4 text-ink-body">{challenge}</p>
+      <p className="mb-4 text-text-2">{challenge}</p>
       {!result && (
         <>
           <textarea
@@ -78,16 +78,16 @@ export default function ReviewCard({ challenge, reviewType, topicId, topicTitle,
             onChange={(e) => setResponse(e.target.value)}
             placeholder="Write your response here..."
             rows={4}
-            className="lined-paper w-full rounded-md border border-tan-light p-3 font-hand text-lg text-ink-body placeholder:text-ink-muted/50 focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber"
+            className="lined-paper w-full rounded-md border border-border p-3 font-study text-lg text-text-2 placeholder:text-text-3/50 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
           />
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-xs text-ink-muted">
+            <span className="text-xs text-text-3">
               {remaining > 0 ? `${remaining} more characters needed` : "Ready to submit"}
             </span>
             <button
               onClick={handleSubmit}
               disabled={!canSubmit || loading}
-              className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber/90 disabled:opacity-50"
+              className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
             >
               Submit Response
             </button>
@@ -98,21 +98,21 @@ export default function ReviewCard({ challenge, reviewType, topicId, topicTitle,
       {result && (
         <div className={`mt-4 rounded-md border p-4 ${result.passed ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}>
           <p className="font-medium text-sm mb-1">{result.passed ? "Passed!" : "Not quite"}</p>
-          <p className="text-sm text-ink-body">{result.feedback as string}</p>
+          <p className="text-sm text-text-2">{result.feedback as string}</p>
           {reviewType === "teach-it" && Boolean(result.follow_up_question) && (
-            <p className="mt-2 text-sm text-ink-muted italic">Follow-up: {result.follow_up_question as string}</p>
+            <p className="mt-2 text-sm text-text-3 italic">Follow-up: {result.follow_up_question as string}</p>
           )}
           {reviewType === "what-if" && result.depth_score !== undefined && (
-            <p className="mt-2 text-sm text-ink-muted">Depth score: {result.depth_score as number}/3</p>
+            <p className="mt-2 text-sm text-text-3">Depth score: {result.depth_score as number}/3</p>
           )}
           {reviewType === "connect" && Boolean(result.connection_quality) && (
-            <p className="mt-2 text-sm text-ink-muted">Connection quality: {result.connection_quality as string}</p>
+            <p className="mt-2 text-sm text-text-3">Connection quality: {result.connection_quality as string}</p>
           )}
         </div>
       )}
       {loading && (
-        <div className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-amber border-t-transparent" />
+        <div className="mt-3 flex items-center gap-2 text-sm text-text-3">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />
           Evaluating...
         </div>
       )}
