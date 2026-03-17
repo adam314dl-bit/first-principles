@@ -11,6 +11,7 @@ describe("Database Schema", () => {
     ["attempts", schema.attempts, ["id", "sessionId", "content", "hintLevelUsed", "timestamp"]],
     ["reviewResults", schema.reviewResults, ["id", "sessionId", "reviewType", "passed", "feedback", "timestamp"]],
     ["visualizations", schema.visualizations, ["id", "topicId", "visualizationCode", "source", "createdAt"]],
+    ["lessons", schema.lessons, ["id", "topicId", "hook", "problem", "hint1", "hint2", "hint3", "explanation", "goingDeeper"]],
   ];
 
   it.each(cases)("%s table has all required columns", (_name, table, cols) => {

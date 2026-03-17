@@ -69,3 +69,15 @@ export const visualizations = sqliteTable("visualizations", {
   source: text("source", { enum: ["ai-generated", "curated"] }).notNull().default("ai-generated"),
   createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
+
+export const lessons = sqliteTable("lessons", {
+  id: text("id").primaryKey(),
+  topicId: text("topic_id").notNull().references(() => topics.id),
+  hook: text("hook").notNull(),
+  problem: text("problem").notNull(),
+  hint1: text("hint1").notNull(),
+  hint2: text("hint2").notNull(),
+  hint3: text("hint3").notNull(),
+  explanation: text("explanation").notNull(),
+  goingDeeper: text("going_deeper").notNull(),
+});
