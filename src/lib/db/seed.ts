@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import * as schema from "./schema";
 import seedData from "../../data/seed-cosmos.json";
+import lessonsData from "../../data/seed-lessons.json";
 import path from "path";
 
 async function seed() {
@@ -21,6 +22,7 @@ async function seed() {
   db.delete(schema.attempts).run();
   db.delete(schema.messages).run();
   db.delete(schema.sessions).run();
+  db.delete(schema.lessons).run();
   db.delete(schema.topics).run();
 
   for (const topic of seedData.topics) {
@@ -45,6 +47,21 @@ async function seed() {
     }).run();
   }
   console.log(`Inserted ${seedData.edges.length} edges.`);
+
+  for (const lesson of lessonsData) {
+    db.insert(schema.lessons).values({
+      id: lesson.id,
+      topicId: lesson.topicId,
+      hook: lesson.hook,
+      problem: lesson.problem,
+      hint1: lesson.hint1,
+      hint2: lesson.hint2,
+      hint3: lesson.hint3,
+      explanation: lesson.explanation,
+      goingDeeper: lesson.goingDeeper,
+    }).run();
+  }
+  console.log(`Inserted ${lessonsData.length} lessons.`);
 
   console.log("Seeding complete.");
   sqlite.close();

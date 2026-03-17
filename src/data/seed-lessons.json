@@ -1,7 +1,7 @@
 [
   {
     "id": "lesson-algebra-basics",
-    "topicId": "algebra-basics",
+    "topicId": "calculus-primer",
     "hook": "Every time you balance a budget, adjust a recipe, or figure out how fast to drive to arrive on time, you are doing algebra — reasoning backwards. You know the result you want, and you have to find the number that produces it. Algebra is not about memorizing procedures. It is about one simple idea: unknown quantities can be named, and once named, they can be found.",
     "problem": "You have two jars. Together they hold 20 marbles. One jar holds 4 more marbles than the other. Without guessing and checking, can you figure out how many marbles are in each jar — and describe a method that would work for *any* two numbers?",
     "hint1": "What if you gave the unknown quantity a name — say, the number in the smaller jar is $x$. Can you write a sentence about the two jars using only $x$?",
@@ -12,7 +12,7 @@
   },
   {
     "id": "lesson-quadratics",
-    "topicId": "quadratics",
+    "topicId": "calculus-primer",
     "hook": "Throw a ball. The arc it traces is not a circle. It is not a straight line. It is a parabola — described by a quadratic equation. Quadratics appear everywhere that two things multiply together: area, acceleration, the path of anything that falls. They are the first equations where the answer is not unique, and that ambiguity turns out to be deeply meaningful.",
     "problem": "A ball is thrown straight upward from the ground. Its height in meters at time $t$ seconds is $h(t) = 20t - 5t^2$. When does it hit the ground again? When does it reach its maximum height? Try to reason through this without the quadratic formula — think about what $h(t) = 0$ means physically.",
     "hint1": "$h(t) = 0$ means the ball is at ground level. It starts there and returns there. Can you factor $20t - 5t^2$? Look for something both terms share.",
@@ -23,7 +23,7 @@
   },
   {
     "id": "lesson-functions",
-    "topicId": "functions",
+    "topicId": "calculus-primer",
     "hook": "A function is one of the most powerful ideas in mathematics, and it is disarmingly simple. It is a promise: give me an input and I will give you back exactly one output. No surprises. That single constraint — one output per input — is what makes calculus possible, what makes programming predictable, and what makes cryptography work. Every function in every programming language is named after this mathematical idea.",
     "problem": "A coffee machine in your office always gives espresso when you press the espresso button — every single time. A magic 8-ball gives you a different answer every time you ask the same question. Which one is a function? Use these two examples to figure out exactly what the essential property of a function must be, then state a definition in your own words.",
     "hint1": "What does the coffee machine *promise* you that the magic 8-ball does not?",
@@ -34,7 +34,7 @@
   },
   {
     "id": "lesson-trigonometry",
-    "topicId": "trigonometry",
+    "topicId": "oscillations",
     "hook": "The ancient Greeks noticed something remarkable: the *ratio* of a triangle's sides depends only on its angles, not on how big the triangle is. A tiny right triangle with a 30° angle and a giant one have the same ratios. That scale-independence means you can measure the height of a mountain by standing far away with a protractor — no climbing required. This observation turned out to be one of the most productive ideas in all of science.",
     "problem": "You stand 100 meters from the base of a building and look up at its top. The angle from the ground to your line of sight is 60°. Without a measuring tape, how tall is the building? Think about what the angle tells you about the relationship between the sides of the triangle you are standing in.",
     "hint1": "Draw the situation. You have a right triangle. You know one angle (60°) and the side *adjacent* to it (100 m). You want the side *opposite* to it (the building height). What ratio connects \"opposite\" to \"adjacent\"?",
@@ -45,7 +45,7 @@
   },
   {
     "id": "lesson-limits",
-    "topicId": "limits",
+    "topicId": "calculus-primer",
     "hook": "For most of history, mathematicians were terrified of two things: infinity and zero. You cannot divide by zero — it breaks arithmetic. You cannot add infinitely many things — the sum might never settle. Yet calculus, the most powerful tool in mathematics, is built entirely on both. The concept that makes this safe is the limit: a way of asking \"what value does this approach?\" without ever having to arrive there.",
     "problem": "The sequence $\\frac{1}{2}, \\frac{1}{4}, \\frac{1}{8}, \\frac{1}{16}, \\ldots$ never reaches 0 — every term is positive. Yet the sum $\\frac{1}{2} + \\frac{1}{4} + \\frac{1}{8} + \\cdots$ seems to approach exactly 1. Does it actually reach 1, or only get close? And what is the difference between \"approaching\" and \"reaching\"? Think carefully — this is not a trick question, but the answer requires precision.",
     "hint1": "Plot the partial sums on a number line: $\\frac{1}{2}$, then $\\frac{3}{4}$, then $\\frac{7}{8}$, then $\\frac{15}{16}$. Can you see a pattern? What is the gap between each partial sum and 1?",
@@ -56,7 +56,7 @@
   },
   {
     "id": "lesson-derivatives",
-    "topicId": "derivatives",
+    "topicId": "calculus-primer",
     "hook": "Your speedometer does not count anything. It does not measure total distance driven. It answers a stranger question: how fast are you moving *right now* — not over the last minute, not over the last mile, but at this exact instant. That seems impossible, because speed is distance divided by time, and \"right now\" has no duration. The derivative is the mathematical trick that makes instantaneous speed — and instantaneous rates of anything — precise and computable.",
     "problem": "A car's position in meters at time $t$ seconds is $x(t) = t^2$. At exactly $t = 3$ seconds, what is the car's speed? You can easily find the *average* speed between $t = 3$ and $t = 4$: just compute $\\frac{x(4) - x(3)}{1}$. But average speed is not the same as speed at an instant. Figure out a way to get the instantaneous speed.",
     "hint1": "Compute the average speed between $t = 3$ and $t = 3.1$. Then between $t = 3$ and $t = 3.01$. Then $t = 3$ and $t = 3.001$. What number are all these approaching?",
@@ -67,7 +67,7 @@
   },
   {
     "id": "lesson-integrals",
-    "topicId": "integrals",
+    "topicId": "calculus-primer",
     "hook": "The derivative answers \"how fast is this changing right now?\" The integral answers the reverse: \"how much has accumulated in total?\" These look like completely unrelated questions. The most surprising theorem in calculus — the Fundamental Theorem — says they are perfectly inverse to each other. To find total accumulation, find a function whose derivative is what you are accumulating. That connection between rate and total is the engine of physics, economics, and engineering.",
     "problem": "A car accelerates steadily so that its velocity at time $t$ is $v(t) = 2t$ m/s. How far does it travel between $t = 0$ and $t = 5$ seconds? You cannot just multiply speed by time because the speed keeps changing. Think geometrically: what does the area under the velocity curve represent?",
     "hint1": "During a tiny slice of time $dt$ at moment $t$, the car is moving at roughly $v(t) = 2t$ m/s. How far does it travel in that tiny slice?",
@@ -133,7 +133,7 @@
   },
   {
     "id": "lesson-waves",
-    "topicId": "waves",
+    "topicId": "wave-mechanics",
     "hook": "Waves are not things — they are patterns of motion. When an ocean wave passes under a boat, the water molecules move in circles and return to where they started. The pattern travels, but the material does not. This matters enormously: sound is a pressure wave (air molecules do not travel from speaker to ear — the disturbance does), and light is an electromagnetic wave that needs no material medium at all. Waves are how the universe transmits information without moving matter.",
     "problem": "Two loudspeakers sit side by side, both playing the same pure tone at 340 Hz. You walk in front of them and discover that some spots are extremely loud and others are completely silent — even though both speakers are working perfectly. What is happening? Can you predict where the silent spots will be?",
     "hint1": "The silent spots occur where the two waves cancel each other exactly. What has to be true about the two waves at those points for them to cancel — what is the relationship between their peaks and troughs?",
@@ -155,7 +155,7 @@
   },
   {
     "id": "lesson-arrays-lists",
-    "topicId": "arrays-lists",
+    "topicId": "graphs",
     "hook": "Almost every program ever written needs to store a collection of things — a list of users, a history of actions, a sequence of pixels. The most fundamental structure for this is the array: a contiguous block of memory where you can reach any element instantly by its position. Understanding why arrays are fast — and what they trade away to achieve that speed — is the beginning of thinking algorithmically.",
     "problem": "You have an array of 1 million numbers. You want to find whether a specific number is in the array. How many operations might this take — and does it matter whether the array is sorted? Think through both cases carefully and compare them.",
     "hint1": "For an unsorted array, how many elements might you need to check in the worst case? What if the number is not there at all?",
@@ -166,7 +166,7 @@
   },
   {
     "id": "lesson-recursion",
-    "topicId": "recursion",
+    "topicId": "graphs",
     "hook": "A function that calls itself sounds like a recipe for disaster — infinite loops, crashes, chaos. And it will be, if you write it carelessly. But with one crucial safeguard — a base case — recursion becomes the most natural language for problems that have self-similar structure. Trees, file systems, parsers, divide-and-conquer algorithms: all of them are recursion hiding in plain sight. The key mental shift is learning to trust the recursion: do not trace every call, just define what it should do and let it do it.",
     "problem": "Compute $5! = 5 \\times 4 \\times 3 \\times 2 \\times 1 = 120$. Easy with a loop. Now write a function that computes $n!$ for any $n$, but using only this one observation: \"the factorial of $n$ is $n$ times the factorial of something smaller than $n$.\" What is that something smaller, and when do you stop?",
     "hint1": "$5! = 5 \\times 4!$. And $4! = 4 \\times 3!$. In general, what is $n!$ in terms of $(n-1)!$?",
@@ -177,7 +177,7 @@
   },
   {
     "id": "lesson-sorting-algorithms",
-    "topicId": "sorting-algorithms",
+    "topicId": "graphs",
     "hook": "Sorting is one of the most studied problems in computer science — not because programmers love tidiness, but because sorting is a perfect microcosm of algorithmic thinking. Small changes in strategy produce enormous differences in performance. Proving an algorithm correct is as important as making it fast. And sorting reveals a beautiful result: there is a theoretical minimum number of comparisons any sorting algorithm must make, and the best algorithms achieve it exactly.",
     "problem": "You have 8 cards face-down, each with a different number, and you can only compare two at a time. What is the minimum number of comparisons you need, in the worst case, to guarantee the cards are in order? Try to reason from first principles about how much *information* each comparison gives you.",
     "hint1": "How many possible orderings exist for 8 cards? (8 choices for first, 7 for second...) Each comparison gives you one bit of information: which card is larger. How many bits do you need to distinguish all orderings?",
@@ -188,7 +188,7 @@
   },
   {
     "id": "lesson-big-o",
-    "topicId": "big-o",
+    "topicId": "graphs",
     "hook": "How do you compare two algorithms when you do not know what computer they will run on, what language they are written in, or how large the input will be? You need a way to capture the essential growth behaviour and ignore everything else. Big-O notation is that language. It is not about exact speed — it is about how speed *scales*. The difference between $O(n)$ and $O(n^2)$ is the difference between a program that takes 1 second on 1 million items and one that takes 11 days.",
     "problem": "Function A does 1,000 operations for 10 inputs and 2,000 for 20 inputs. Function B does 100 operations for 10 inputs and 400 for 20 inputs. Function B is currently faster. Will it always be faster for large inputs? Think about *how* each function grows as the input size doubles.",
     "hint1": "When the input doubled (10 → 20), how did each function's operation count change? What does \"doubling the input doubles the operations\" imply about growth rate — and what does \"doubling the input quadruples the operations\" imply?",
@@ -199,7 +199,7 @@
   },
   {
     "id": "lesson-trees-graphs",
-    "topicId": "trees-graphs",
+    "topicId": "graphs",
     "hook": "Hierarchies are everywhere: your family tree, the file system on your computer, the structure of a web page, the classification of species. Networks are everywhere: road maps, social connections, the internet, power grids. Trees and graphs are the mathematical structures that capture these two shapes. Traversing them efficiently is one of the most practically important skills in all of computer science — underlying GPS navigation, web crawling, social network analysis, and compiler design.",
     "problem": "You have a maze represented as a grid. Each cell is either a wall or open space. You start at the top-left and want to reach the bottom-right. Model this as a graph and design an algorithm to find a path — making sure you never visit the same cell twice.",
     "hint1": "Each open cell is a node. Two adjacent open cells are connected by an edge. The problem is now: find a path from start to end in this graph. What graph traversal strategies do you know of?",
@@ -210,7 +210,7 @@
   },
   {
     "id": "lesson-hash-tables",
-    "topicId": "hash-tables",
+    "topicId": "graphs",
     "hook": "Arrays give you instant access by position — $O(1)$. But what if you want instant access by an arbitrary key, like a username or a word? Sorted arrays with binary search give $O(\\log n)$ — good, but not instant. Hash tables achieve amortised $O(1)$ lookup, insertion, and deletion for any key, by converting keys into array indices using a hash function. This single trick underlies Python dictionaries, JavaScript objects, database indexes, and most caches in existence.",
     "problem": "You need to check whether a username exists in a database of 1 million users, thousands of times per second. Binary search gives about 20 comparisons per lookup. Can you design a structure that reduces this to roughly 1 or 2 operations? What would you need to do to a username string to turn it into an array index?",
     "hint1": "What if you had a function that converted any string to an integer? If \"alice\" always mapped to 42 and \"bob\" always mapped to 107, you could store users at those positions and look them up instantly. What property must this function have to be useful?",
