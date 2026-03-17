@@ -66,50 +66,50 @@ export default function ChallengeMode({ topicId, topicTitle, sessionId }: Challe
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-serif text-xl text-ink">Challenge Mode</h2>
-        <button onClick={generateChallenge} disabled={loading} className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber/90 disabled:opacity-50">
+        <h2 className="font-serif text-xl text-text">Challenge Mode</h2>
+        <button onClick={generateChallenge} disabled={loading} className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50">
           {challenge ? "New Challenge" : "Generate Challenge"}
         </button>
       </div>
       {error && <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
       {challenge && (
-        <div className="rounded-lg border border-tan-light bg-white p-5 shadow-sm">
-          <div className="prose prose-sm max-w-none text-ink-body whitespace-pre-wrap">{challenge}</div>
+        <div className="rounded-lg border border-border bg-white p-5 shadow-sm">
+          <div className="prose prose-sm max-w-none text-text-2 whitespace-pre-wrap">{challenge}</div>
         </div>
       )}
       {challenge && hints.length > 0 && (
         <div className="space-y-2">
           {hints.map((hint, i) => (
-            <div key={i} className="rounded-md border border-amber-light bg-amber-light/30 p-3 text-sm text-ink-body">
-              <span className="font-medium text-amber">Hint {i + 1}:</span> {hint}
+            <div key={i} className="rounded-md border border-accent-border bg-accent-surface p-3 text-sm text-text-2">
+              <span className="font-medium text-accent">Hint {i + 1}:</span> {hint}
             </div>
           ))}
         </div>
       )}
       {challenge && hintLevel < 3 && (
-        <button onClick={requestHint} disabled={loading} className="self-start rounded-md border border-tan-dark bg-parchment px-3 py-1.5 text-sm text-ink-muted transition-colors hover:bg-tan-light disabled:opacity-50">
+        <button onClick={requestHint} disabled={loading} className="self-start rounded-md border border-border bg-surface px-3 py-1.5 text-sm text-text-3 transition-colors hover:bg-surface disabled:opacity-50">
           {hintLevel === 0 ? "Need a hint?" : `Hint ${hintLevel + 1} of 3`}
         </button>
       )}
       {challenge && (
         <div className="space-y-2">
-          <label htmlFor="attempt-input" className="text-sm font-medium text-ink-body">Your attempt</label>
-          <textarea id="attempt-input" value={attempt} onChange={(e) => setAttempt(e.target.value)} disabled={hasSubmitted} placeholder="Think through it from first principles. Even a partial thought counts..." rows={5} className="lined-paper w-full rounded-md border border-tan-light p-3 font-hand text-lg text-ink-body placeholder:text-ink-muted/50 focus:border-amber focus:outline-none focus:ring-1 focus:ring-amber disabled:opacity-60" />
+          <label htmlFor="attempt-input" className="text-sm font-medium text-text-2">Your attempt</label>
+          <textarea id="attempt-input" value={attempt} onChange={(e) => setAttempt(e.target.value)} disabled={hasSubmitted} placeholder="Think through it from first principles. Even a partial thought counts..." rows={5} className="lined-paper w-full rounded-md border border-border p-3 font-study text-lg text-text-2 placeholder:text-text-3/50 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent disabled:opacity-60" />
           <div className="flex items-center justify-between">
-            <span className="text-xs text-ink-muted">{attempt.trim().length}/20 characters minimum</span>
+            <span className="text-xs text-text-3">{attempt.trim().length}/20 characters minimum</span>
             {!hasSubmitted && (
-              <button onClick={submitAttempt} disabled={loading || attempt.trim().length < 20} className="rounded-md bg-amber px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-amber/90 disabled:opacity-50">Submit Attempt</button>
+              <button onClick={submitAttempt} disabled={loading || attempt.trim().length < 20} className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50">Submit Attempt</button>
             )}
           </div>
         </div>
       )}
       {challenge && hasSubmitted && !explanation && (
-        <button onClick={requestExplanation} disabled={loading} className="rounded-md border-2 border-dashed border-gold bg-amber-light/20 px-4 py-3 text-sm font-medium text-gold transition-colors hover:bg-amber-light/40 disabled:opacity-50">Unlock Full Explanation</button>
+        <button onClick={requestExplanation} disabled={loading} className="rounded-md border-2 border-dashed border-gold bg-gold-surface px-4 py-3 text-sm font-medium text-gold transition-colors hover:bg-amber-light/40 disabled:opacity-50">Unlock Full Explanation</button>
       )}
       {explanation && (
         <div className="rounded-lg border border-gold bg-white p-5 shadow-sm">
           <h3 className="mb-3 font-serif text-lg text-gold">Explanation</h3>
-          <div className="prose prose-sm max-w-none text-ink-body whitespace-pre-wrap">{explanation}</div>
+          <div className="prose prose-sm max-w-none text-text-2 whitespace-pre-wrap">{explanation}</div>
         </div>
       )}
       {explanation && (
@@ -117,7 +117,7 @@ export default function ChallengeMode({ topicId, topicTitle, sessionId }: Challe
           <Visualization topicId={topicId} topicTitle={topicTitle} />
         </div>
       )}
-      {loading && <div className="flex items-center gap-2 text-sm text-ink-muted"><div className="h-4 w-4 animate-spin rounded-full border-2 border-amber border-t-transparent" />Tutor is thinking...</div>}
+      {loading && <div className="flex items-center gap-2 text-sm text-text-3"><div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />Tutor is thinking...</div>}
     </div>
   );
 }
